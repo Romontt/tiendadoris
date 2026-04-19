@@ -3,88 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Doris | Boutique de Tesoros</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,600&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>Doris Boutique | Tesoros Pre-Amados</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;1,500&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="estilos.css">
 </head>
 <body>
-
-    <nav class="nav-boutique">
-        <div class="logo">DORIS.</div>
-        <div class="nav-links">
-            <button onclick="filtrar('Todos')">Archivo</button>
-            <button onclick="filtrar('Mujer')">Mujer</button>
-            <button onclick="filtrar('Hombre')">Hombre</button>
-            <button onclick="filtrar('Niños')">Niños</button>
-            <button style="color: var(--naranja-tierra); font-weight: 600;">🛒 (0)</button>
-        </div>
-    </nav>
-
-    <section class="hero-container">
-        <div class="hero-text">
-            <p>Guápiles, Costa Rica</p>
-            <h1>Tesoros con <br><i>Pasado.</i></h1>
-            <div style="max-width: 400px; margin-top: 30px; opacity: 0.8; line-height: 1.8;">
-                Curaduría exclusiva de ropa americana. Piezas seleccionadas una a una, rescatando la calidad y el estilo que trasciende el tiempo.
-            </div>
-            <button class="btn-primary" style="margin-top: 40px;">Explorar Archivo</button>
-        </div>
-        <div class="hero-image-decor">
-            <div class="hero-frame">
-                <img src="https://images.unsplash.com/photo-1558769132-cb1aea458c5e?q=80&w=1974" alt="Estilo Boutique">
-            </div>
-        </div>
-    </section>
-
-    <main class="main-content">
-        <div class="section-intro">
-            <span class="label">Colección Actual</span>
-            <h2 class="display-title">Piezas Únicas</h2>
-            <div class="accent-line"></div>
-        </div>
-
-        <div class="grid-boutique" id="grid-productos">
-            <article class="product-card">
-                <div class="image-holder">
-                    <img src="https://images.unsplash.com/photo-1539109136881-3be0616acf4b?q=80&w=1974" alt="Producto">
-                </div>
-                <div class="product-info">
-                    <span class="category-tag">Vintage Select</span>
-                    <h3>Chaqueta de Lana Italiana</h3>
-                    <p class="product-price">₡18,500</p>
-                    <button class="btn-minimal">Añadir al Carrito</button>
-                </div>
-            </article>
-
-            <article class="product-card" style="margin-top: 60px;">
-                <div class="image-holder" style="box-shadow: 20px 20px 0px var(--azul-noche);">
-                    <img src="https://images.unsplash.com/photo-1591047139829-d91aecb6caea?q=80&w=1936" alt="Producto">
-                </div>
-                <div class="product-info">
-                    <span class="category-tag">Limited Edition</span>
-                    <h3>Vestido Seda Floral</h3>
-                    <p class="product-price">₡12,000</p>
-                    <button class="btn-minimal">Añadir al Carrito</button>
-                </div>
-            </article>
-        </div>
-    </main>
-
-    <footer class="footer-boutique">
-        <div class="footer-grid">
-            <div class="footer-brand">
-                <div class="logo">DORIS.</div>
-                <p>Moda con propósito y alma.</p>
-            </div>
-            <div class="footer-info">
-                <p><b>Ubicación</b><br>Costado Norte del Parque, Guápiles.</p>
-                <p><b>Envíos</b><br>A todo el país por Correos de CR.</p>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            © 2026 La Americana de Doris - Hecho con amor.
-        </div>
-    </footer>
-
+    <div id="root"></div>
+    <script src="index.js" type="module"></script>
 </body>
 </html>
