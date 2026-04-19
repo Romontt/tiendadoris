@@ -1,23 +1,38 @@
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
 <header>
-  <div class="logo">La Americana de Doris</div>
-  <nav>
-    <button onclick="filtrar('Bebé')">Bebé</button>
-    <button onclick="filtrar('Niño')">Niño</button>
-    <button onclick="filtrar('Niña')">Niña</button>
-    <button onclick="filtrar('Hombre')">Hombre</button>
-    <button onclick="filtrar('Mujer')">Mujer</button>
+  <div class="logo-container">
+    <h1>La Americana de Doris</h1>
+  </div>
+  
+  <nav class="nav-filters">
+    <button class="btn-filter active" onclick="filtrar('Todos', this)">Todos</button>
+    <button class="btn-filter" onclick="filtrar('Bebé', this)">Bebé</button>
+    <button class="btn-filter" onclick="filtrar('Niño', this)">Niño</button>
+    <button class="btn-filter" onclick="filtrar('Niña', this)">Niña</button>
+    <button class="btn-filter" onclick="filtrar('Hombre', this)">Hombre</button>
+    <button class="btn-filter" onclick="filtrar('Mujer', this)">Mujer</button>
   </nav>
-  <div class="cart-icon">🛒 <span id="cart-count">0</span></div>
+
+  <div class="cart-status">
+    <span class="cart-icon">🛒</span>
+    <span id="cart-count">0</span>
+  </div>
 </header>
 
 <section class="hero">
-  <h1>Tesoros con Historia</h1>
-  <p>Ropa americana seleccionada con amor por Doris.</p>
+  <div class="hero-content">
+    <h2>Tesoros con Historia</h2>
+    <p>Ropa americana seleccionada pieza por pieza en Guápiles.</p>
+  </div>
 </section>
 
 <section id="grid-productos" class="grid">
   </section>
 
 <footer>
-  <p>© 2026 La Americana de Doris - Guápiles, Costa Rica</p>
+  <div class="footer-content">
+    <p>© 2026 La Americana de Doris — Guápiles, Pococí</p>
+    <small>Hecho con amor para Doris</small>
+  </div>
 </footer>
