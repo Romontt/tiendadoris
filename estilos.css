@@ -1,166 +1,166 @@
 :root {
-    --verde-boutique: #1e3932;
-    --naranja-terra: #d46a4e;
-    --azul-noche: #0a192f;
-    --bg-gris: #f4f7f6; /* Fondo tipo app */
-    --blanco: #ffffff;
-    --sombra: 0 10px 30px rgba(0,0,0,0.08);
+    --verde-boutique: #0d211a;
+    --naranja-oro: #c5a059; /* Un dorado tierra más fino */
+    --azul-noche: #050a14;
+    --crema-seda: #fdfcf9;
+    --texto: #1a1a1a;
 }
 
 body {
-    background-color: var(--bg-gris);
+    background-color: var(--crema-seda);
     font-family: 'Montserrat', sans-serif;
+    color: var(--texto);
     margin: 0;
 }
 
-/* Navbar tipo Punto 506 */
+/* Navbar Ultra-Minimalista */
 .nav-container {
-    background: var(--azul-noche);
-    padding: 15px 5%;
+    padding: 30px 8%;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    position: sticky;
-    top: 0;
+    background: transparent;
+    position: absolute;
+    width: 100%;
     z-index: 1000;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
 }
 
 .logo {
-    color: white;
     font-family: 'Cormorant Garamond', serif;
-    font-size: 1.8rem;
-    letter-spacing: 3px;
-    font-weight: bold;
+    font-size: 2.2rem;
+    font-weight: 300;
+    letter-spacing: 8px;
+    color: var(--verde-boutique);
+    text-transform: uppercase;
 }
 
-/* Header con impacto visual */
+/* Hero Section: Inmersivo */
 .hero {
-    background: linear-gradient(rgba(30, 57, 50, 0.8), rgba(30, 57, 50, 0.8)), 
-                url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=2070&auto=format&fit=crop');
+    height: 90vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(rgba(255,255,255,0.2), rgba(255,255,255,0.2)), 
+                url('https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=2070');
     background-size: cover;
-    background-position: center;
-    color: white;
-    padding: 80px 5%;
+    background-attachment: fixed;
     text-align: center;
-    margin-bottom: -40px; /* Para que los filtros monten un poco */
 }
 
-/* Barra de filtros estilo "Pills" */
+.hero h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(3rem, 10vw, 7rem);
+    font-weight: 300;
+    font-style: italic;
+    color: var(--verde-boutique);
+    margin: 0;
+    line-height: 0.8;
+}
+
+/* Filtros de Lujo */
 .filter-bar {
-    background: var(--blanco);
-    max-width: 800px;
-    margin: 0 auto 40px;
-    padding: 15px;
-    border-radius: 50px;
+    padding: 60px 0;
     display: flex;
     justify-content: center;
-    gap: 10px;
-    box-shadow: var(--sombra);
-    position: relative;
-    z-index: 10;
+    gap: 40px;
+    background: var(--crema-seda);
 }
 
 .filter-btn {
     border: none;
     background: none;
-    padding: 10px 20px;
-    border-radius: 30px;
+    font-size: 0.7rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
     cursor: pointer;
-    font-weight: 500;
-    transition: all 0.3s;
-    color: var(--azul-noche);
+    color: var(--texto);
+    opacity: 0.4;
+    transition: 0.5s;
+    position: relative;
 }
 
 .filter-btn.active {
-    background: var(--naranja-terra);
-    color: white;
+    opacity: 1;
 }
 
-/* Grid de Directorio */
+.filter-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 25%;
+    width: 50%;
+    height: 1px;
+    background: var(--naranja-oro);
+}
+
+/* Grid de Galería de Arte */
 .main-content {
-    max-width: 1300px;
-    margin: 0 auto;
-    padding: 40px 5%;
+    padding: 0 8% 150px;
 }
 
 .product-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 30px;
+    grid-template-columns: repeat(2, 1fr); /* Solo 2 columnas para dar importancia */
+    gap: 120px 60px;
 }
 
-/* Card Robusta */
+/* Item de Lujo */
 .product-card {
-    background: var(--blanco);
-    border-radius: 20px;
-    overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    border: 1px solid rgba(0,0,0,0.05);
-    display: flex;
-    flex-direction: column;
-}
-
-.product-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+    position: relative;
+    cursor: pointer;
 }
 
 .image-container {
-    position: relative;
-    height: 350px;
+    overflow: hidden;
+    aspect-ratio: 10 / 13;
+    background: #f0f0f0;
+    transition: 0.8s cubic-bezier(0.2, 1, 0.3, 1);
 }
 
 .image-container img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    filter: grayscale(20%);
+    transition: 1.5s cubic-bezier(0.2, 1, 0.3, 1);
 }
 
-.badge-cat {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    background: var(--verde-boutique);
-    color: white;
-    padding: 5px 15px;
-    border-radius: 20px;
-    font-size: 0.7rem;
-    font-weight: bold;
+.product-card:hover .image-container img {
+    transform: scale(1.05);
+    filter: grayscale(0%);
 }
 
-.card-content {
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
+.product-info {
+    margin-top: 30px;
+    text-align: center;
 }
 
-.card-content h3 {
-    margin: 0 0 10px 0;
+.product-info h3 {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 1.4rem;
+    font-size: 1.8rem;
+    font-weight: 400;
+    margin-bottom: 10px;
 }
 
-.price-tag {
-    color: var(--naranja-terra);
-    font-size: 1.2rem;
-    font-weight: bold;
-    margin-bottom: 15px;
-}
-
-.btn-detalles {
-    margin-top: auto;
-    background: var(--azul-noche);
-    color: white;
-    border: none;
-    padding: 12px;
-    border-radius: 10px;
-    cursor: pointer;
+.price {
+    font-size: 0.9rem;
+    letter-spacing: 2px;
+    color: var(--naranja-oro);
     font-weight: 500;
-    transition: background 0.3s;
 }
 
-.btn-detalles:hover {
-    background: var(--verde-boutique);
+/* Animación de entrada */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(40px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.product-card {
+    animation: fadeInUp 1.2s ease forwards;
+}
+
+@media (max-width: 768px) {
+    .product-grid { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 4rem; }
 }
