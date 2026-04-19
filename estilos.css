@@ -1,166 +1,173 @@
 :root {
     --verde-boutique: #0d211a;
-    --naranja-oro: #c5a059; /* Un dorado tierra más fino */
-    --azul-noche: #050a14;
-    --crema-seda: #fdfcf9;
-    --texto: #1a1a1a;
+    --oro-viejo: #b5945d;
+    --azul-profundo: #050a14;
+    --blanco-hueso: #f4f1ea;
+    --shadow-soft: 0 20px 40px rgba(0,0,0,0.05);
 }
 
 body {
-    background-color: var(--crema-seda);
+    background-color: var(--blanco-hueso);
     font-family: 'Montserrat', sans-serif;
-    color: var(--texto);
+    color: var(--verde-boutique);
     margin: 0;
+    overflow-x: hidden;
 }
 
-/* Navbar Ultra-Minimalista */
+/* Navbar Minimalista y Transparente */
 .nav-container {
-    padding: 30px 8%;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    padding: 30px 5%;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: transparent;
-    position: absolute;
-    width: 100%;
-    z-index: 1000;
+    mix-blend-mode: difference; /* Esto hace que el logo cambie de color según el fondo */
 }
 
 .logo {
+    color: white;
     font-family: 'Cormorant Garamond', serif;
-    font-size: 2.2rem;
+    font-size: 2rem;
+    letter-spacing: 10px;
     font-weight: 300;
-    letter-spacing: 8px;
-    color: var(--verde-boutique);
-    text-transform: uppercase;
 }
 
-/* Hero Section: Inmersivo */
+/* HERO: Diseño Editorial con Capas */
 .hero {
-    height: 90vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+    height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     align-items: center;
-    background: linear-gradient(rgba(255,255,255,0.2), rgba(255,255,255,0.2)), 
-                url('https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=2070');
-    background-size: cover;
-    background-attachment: fixed;
-    text-align: center;
+    background: var(--verde-boutique);
+    color: var(--blanco-hueso);
+    position: relative;
 }
 
-.hero h1 {
+.hero-text {
+    padding-left: 15%;
+    z-index: 2;
+}
+
+.hero-text h1 {
     font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(3rem, 10vw, 7rem);
-    font-weight: 300;
-    font-style: italic;
-    color: var(--verde-boutique);
-    margin: 0;
+    font-size: clamp(4rem, 12vw, 8rem);
     line-height: 0.8;
+    margin: 0;
 }
 
-/* Filtros de Lujo */
-.filter-bar {
-    padding: 60px 0;
-    display: flex;
-    justify-content: center;
-    gap: 40px;
-    background: var(--crema-seda);
+.hero-text h1 i { font-style: italic; font-weight: 300; }
+
+.hero-image {
+    height: 80%;
+    width: 80%;
+    background: url('https://images.unsplash.com/photo-1539109136881-3be0616acf4b?q=80&w=1887') no-repeat center;
+    background-size: cover;
+    justify-self: center;
+    clip-path: inset(0 0 0 0); /* Efecto de marco */
+    transition: 1s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+/* FILTROS: Barra Flotante Elevada */
+.filter-wrapper {
+    position: sticky;
+    top: 100px;
+    z-index: 10;
+    padding: 40px 0;
+    text-align: center;
+    background: linear-gradient(to bottom, var(--blanco-hueso) 80%, transparent);
 }
 
 .filter-btn {
     border: none;
     background: none;
+    margin: 0 20px;
     font-size: 0.7rem;
     letter-spacing: 4px;
     text-transform: uppercase;
     cursor: pointer;
-    color: var(--texto);
     opacity: 0.4;
-    transition: 0.5s;
-    position: relative;
+    transition: 0.4s;
 }
 
 .filter-btn.active {
     opacity: 1;
+    color: var(--oro-viejo);
 }
 
-.filter-btn.active::after {
-    content: '';
-    position: absolute;
-    bottom: -10px;
-    left: 25%;
-    width: 50%;
-    height: 1px;
-    background: var(--naranja-oro);
-}
-
-/* Grid de Galería de Arte */
+/* GRID: Composición Asimétrica (Layout de Revista) */
 .main-content {
-    padding: 0 8% 150px;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 100px 5%;
 }
 
 .product-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr); /* Solo 2 columnas para dar importancia */
-    gap: 120px 60px;
+    grid-template-columns: repeat(12, 1fr); /* 12 columnas para control total */
+    gap: 150px 0;
 }
 
-/* Item de Lujo */
+/* Card Estilo "Museo" */
 .product-card {
+    grid-column: span 5; /* Ocupa 5 columnas de las 12 */
     position: relative;
-    cursor: pointer;
 }
 
-.image-container {
+.product-card:nth-child(even) {
+    grid-column: 8 / span 5; /* Los pares se mueven a la derecha */
+    margin-top: 100px;
+}
+
+.image-holder {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 3/4;
     overflow: hidden;
-    aspect-ratio: 10 / 13;
-    background: #f0f0f0;
-    transition: 0.8s cubic-bezier(0.2, 1, 0.3, 1);
+    background: #e0e0e0;
+    box-shadow: var(--shadow-soft);
 }
 
-.image-container img {
+.image-holder img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    filter: grayscale(20%);
-    transition: 1.5s cubic-bezier(0.2, 1, 0.3, 1);
+    transition: 1.5s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
-.product-card:hover .image-container img {
-    transform: scale(1.05);
-    filter: grayscale(0%);
+.product-card:hover .image-holder img {
+    transform: scale(1.1);
+}
+
+/* Decoración detrás de la imagen (Depth) */
+.product-card::before {
+    content: '';
+    position: absolute;
+    top: -30px;
+    left: -30px;
+    width: 100px;
+    height: 100px;
+    border-left: 1px solid var(--oro-viejo);
+    border-top: 1px solid var(--oro-viejo);
+    opacity: 0.5;
 }
 
 .product-info {
-    margin-top: 30px;
-    text-align: center;
+    padding: 30px 0;
 }
 
 .product-info h3 {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 1.8rem;
+    font-size: 2rem;
+    margin: 0;
     font-weight: 400;
-    margin-bottom: 10px;
 }
 
 .price {
     font-size: 0.9rem;
     letter-spacing: 2px;
-    color: var(--naranja-oro);
-    font-weight: 500;
-}
-
-/* Animación de entrada */
-@keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(40px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.product-card {
-    animation: fadeInUp 1.2s ease forwards;
-}
-
-@media (max-width: 768px) {
-    .product-grid { grid-template-columns: 1fr; }
-    .hero h1 { font-size: 4rem; }
+    color: var(--oro-viejo);
+    margin-top: 10px;
 }
