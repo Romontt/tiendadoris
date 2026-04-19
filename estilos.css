@@ -1,0 +1,43 @@
+:root {
+  --primario: #d46a4e; /* Terracota */
+  --fondo: #f9f7f2;    /* Crema suave */
+  --texto: #2d3436;
+  --blanco: #ffffff;
+}
+
+body {
+  background-color: var(--fondo);
+  color: var(--texto);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+  padding: 20px;
+}
+
+.card {
+  background: var(--blanco);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  transition: transform 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+.card img {
+  width: 100%;
+  height: 300px;
+  object-fit: cover; /* Esto hace que fotos de diferentes tamaños se vean iguales */
+}
+
+.card-info {
+  padding: 15px;
+  text-align: center;
+}
