@@ -1,88 +1,318 @@
-const { useState, useEffect } = React;
-
-function App() {
-  const [productos, setProductos] = useState([]);
-  const [categoria, setCategoria] = useState('Todos');
-  const [loading, setLoading] = useState(true);
-
-  const SUPABASE_URL = 'https://hvnpkljyoocqdzwdptgt.supabase.co';
-  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2bnBrbGp5b29jcWR6d2RwdGd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2MTAxMTQsImV4cCI6MjA5MjE4NjExNH0.-pq3iVzqJsJCyGNXkFPlHSIQeBTrr7i7ptsY6FYjJZ0';
-  const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-  useEffect(() => {
-    fetchData();
-  }, [categoria]);
-
-  async function fetchData() {
-    setLoading(true);
-    let q = _supabase.from('productos').select('*').eq('disponible', true);
-    if (categoria !== 'Todos') q = q.eq('categoria', categoria);
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La Tiendita de Doris | Curaduría de Moda</title>
     
-    const { data } = await q.order('created_at', { ascending: false });
-    setProductos(data || []);
-    setLoading(false);
-  }
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  return (
-    <div>
-      <nav className="nav-container">
-        <div className="logo">DORIS</div>
-        <div className="nav-links">
-          {['Todos', 'Bebé', 'Niño', 'Niña', 'Hombre', 'Mujer'].map(cat => (
-            <button 
-              key={cat} 
-              className={`filter-btn ${categoria === cat ? 'active' : ''}`}
-              onClick={() => setCategoria(cat)}
-              style={{
-                background: 'none', border: 'none', marginLeft: '20px', 
-                cursor: 'pointer', fontSize: '0.7rem', letterSpacing: '2px',
-                borderBottom: categoria === cat ? '1px solid #d46a4e' : 'none'
-              }}
-            >
-              {cat.toUpperCase()}
-            </button>
-          ))}
-        </div>
-      </nav>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --verde-deep: #1b3022;
+            --azul-luxury: #0a192f;
+            --naranja-accent: #d46a4e;
+            --bg-cream: #faf9f6;
+            --white: #ffffff;
+        }
 
-      <header className="hero">
-        <div className="hero-content" style={{textAlign: 'center'}}>
-          <span style={{letterSpacing: '8px', fontSize: '0.8rem'}}>EST. 2026</span>
-          <h1>Elegancia <br/><i>Reencontrada</i></h1>
-        </div>
-      </header>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
-      <main className="main-content">
-        {loading ? (
-          <p style={{textAlign: 'center', letterSpacing: '4px'}}>CURANDO SELECCIÓN...</p>
-        ) : (
-          <div className="product-grid">
-            {productos.map((p, i) => (
-              <article key={p.id} className="product-card" style={{ marginTop: i % 2 !== 0 ? '100px' : '0' }}>
-                <span className="category-tag">{p.categoria}</span>
-                <div className="image-box">
-                  <img src={p.imagen_url} alt={p.nombre} />
+        body {
+            background-color: var(--bg-cream);
+            font-family: 'Montserrat', sans-serif;
+            color: var(--azul-luxury);
+            line-height: 1.6;
+        }
+
+        /* Navbar Refinado */
+        .nav-container {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 25px 8%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(250, 249, 246, 0.95);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            border-bottom: 1px solid rgba(27, 48, 34, 0.05);
+        }
+
+        .logo {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            font-weight: 600;
+            letter-spacing: 6px;
+            color: var(--verde-deep);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 25px;
+        }
+
+        .filter-btn {
+            background: none;
+            border: none;
+            font-size: 0.7rem;
+            font-weight: 500;
+            letter-spacing: 2px;
+            cursor: pointer;
+            color: var(--azul-luxury);
+            transition: all 0.3s ease;
+            position: relative;
+            padding: 5px 0;
+        }
+
+        .filter-btn::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--naranja-accent);
+            transition: width 0.3s ease;
+        }
+
+        .filter-btn.active { color: var(--naranja-accent); }
+        .filter-btn.active::after { width: 100%; }
+
+        /* Hero Section */
+        .hero {
+            height: 70vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--verde-deep);
+            color: var(--bg-cream);
+            text-align: center;
+            margin-bottom: 80px;
+        }
+
+        .hero-content span {
+            display: block;
+            font-size: 0.8rem;
+            letter-spacing: 10px;
+            margin-bottom: 20px;
+            opacity: 0.8;
+        }
+
+        .hero-content h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(3.5rem, 8vw, 6.5rem);
+            font-weight: 400;
+            line-height: 1;
+        }
+
+        .hero-content h1 i { font-style: italic; }
+
+        /* Contenido Principal */
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 5% 120px;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 100px 50px;
+        }
+
+        /* Tarjeta de Producto */
+        .product-card {
+            display: flex;
+            flex-direction: column;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .category-tag {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 15px;
+            color: var(--naranja-accent);
+            font-weight: 500;
+        }
+
+        .image-box {
+            position: relative;
+            aspect-ratio: 4/5;
+            background: #e5e5e5;
+            overflow: hidden;
+            margin-bottom: 25px;
+            transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .image-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.8s ease;
+        }
+
+        .product-card:hover .image-box img {
+            transform: scale(1.05);
+        }
+
+        .card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .card-meta h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .card-meta p {
+            font-size: 0.75rem;
+            opacity: 0.5;
+            letter-spacing: 1px;
+        }
+
+        .card-price {
+            font-weight: 500;
+            font-size: 1.1rem;
+            color: var(--verde-deep);
+        }
+
+        /* Footer */
+        .footer {
+            background-color: var(--azul-luxury);
+            color: var(--bg-cream);
+            padding: 120px 8% 60px;
+            text-align: center;
+        }
+
+        .footer h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.5rem;
+            letter-spacing: 8px;
+            margin-bottom: 30px;
+        }
+
+        .footer p {
+            font-size: 0.7rem;
+            letter-spacing: 3px;
+            opacity: 0.6;
+        }
+
+        @media (max-width: 768px) {
+            .nav-container { padding: 20px 5%; flex-direction: column; gap: 15px; }
+            .hero { height: 50vh; }
+            .product-grid { gap: 60px 30px; }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        function App() {
+            const [productos, setProductos] = useState([]);
+            const [categoria, setCategoria] = useState('Todos');
+            const [loading, setLoading] = useState(true);
+
+            const SUPABASE_URL = 'https://hvnpkljyoocqdzwdptgt.supabase.co';
+            const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2bnBrbGp5b29jcWR6d2RwdGd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2MTAxMTQsImV4cCI6MjA5MjE4NjExNH0.-pq3iVzqJsJCyGNXkFPlHSIQeBTrr7i7ptsY6FYjJZ0';
+            const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+            useEffect(() => {
+                fetchData();
+            }, [categoria]);
+
+            async function fetchData() {
+                setLoading(true);
+                let q = _supabase.from('productos').select('*').eq('disponible', true);
+                if (categoria !== 'Todos') q = q.eq('categoria', categoria);
+                
+                const { data } = await q.order('created_at', { ascending: false });
+                setProductos(data || []);
+                setLoading(false);
+            }
+
+            return (
+                <div>
+                    <nav className="nav-container">
+                        <a href="#" className="logo">DORIS</a>
+                        <div className="nav-links">
+                            {['Todos', 'Bebé', 'Niño', 'Niña', 'Hombre', 'Mujer'].map(cat => (
+                                <button 
+                                    key={cat} 
+                                    className={`filter-btn ${categoria === cat ? 'active' : ''}`}
+                                    onClick={() => setCategoria(cat)}
+                                >
+                                    {cat.toUpperCase()}
+                                </button>
+                            ))}
+                        </div>
+                    </nav>
+
+                    <header className="hero">
+                        <div className="hero-content">
+                            <span>EST. 2026</span>
+                            <h1>Elegancia <br/><i>Reencontrada</i></h1>
+                        </div>
+                    </header>
+
+                    <main className="main-content">
+                        {loading ? (
+                            <div style={{textAlign: 'center', padding: '100px 0'}}>
+                                <p style={{letterSpacing: '5px', fontSize: '0.8rem', opacity: 0.6}}>CURANDO SELECCIÓN...</p>
+                            </div>
+                        ) : (
+                            <div className="product-grid">
+                                {productos.map((p, i) => (
+                                    <article 
+                                        key={p.id} 
+                                        className="product-card" 
+                                        style={{ transform: i % 2 !== 0 ? 'translateY(60px)' : 'none' }}
+                                    >
+                                        <span className="category-tag">{p.categoria}</span>
+                                        <div className="image-box">
+                                            <img src={p.imagen_url} alt={p.nombre} loading="lazy" />
+                                        </div>
+                                        <div className="card-meta">
+                                            <div>
+                                                <h3>{p.nombre}</h3>
+                                                <p>PIEZA ÚNICA</p>
+                                            </div>
+                                            <span className="card-price">₡{p.precio.toLocaleString()}</span>
+                                        </div>
+                                    </article>
+                                ))}
+                            </div>
+                        )}
+                    </main>
+
+                    <footer className="footer">
+                        <h2>DORIS</h2>
+                        <p>GUÁPILES, COSTA RICA</p>
+                    </footer>
                 </div>
-                <div className="card-meta">
-                  <div>
-                    <h3>{p.nombre}</h3>
-                    <p style={{fontSize: '0.8rem', opacity: 0.6}}>Pieza Única</p>
-                  </div>
-                  <span className="card-price">₡{p.precio.toLocaleString()}</span>
-                </div>
-              </article>
-            ))}
-          </div>
-        )}
-      </main>
+            );
+        }
 
-      <footer style={{padding: '100px 5%', textAlign: 'center', backgroundColor: '#0a192f', color: 'white'}}>
-        <h2 style={{fontFamily: 'Cormorant Garamond', fontSize: '2rem'}}>DORIS</h2>
-        <p style={{fontSize: '0.7rem', opacity: 0.5, marginTop: '20px'}}>GUÁPILES, COSTA RICA</p>
-      </footer>
-    </div>
-  );
-}
-
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(<App />);
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
