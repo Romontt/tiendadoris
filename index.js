@@ -5,11 +5,8 @@ function App() {
     const [categoria, setCategoria] = useState('Todos');
     const [loading, setLoading] = useState(true);
 
-    // Configuración de Supabase extraída de tus credenciales actuales
     const SUPABASE_URL = 'https://hvnpkljyoocqdzwdptgt.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2bnBrbGp5b29jcWR6d2RwdGd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2MTAxMTQsImV4cCI6MjA5MjE4NjExNH0.-pq3iVzqJsJCyGNXkFPlHSIQeBTrr7i7ptsY6FYjJZ0';
-    
-    // Inicialización del cliente usando la librería global cargada en el HTML
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     useEffect(() => {
@@ -19,113 +16,87 @@ function App() {
     async function fetchData() {
         setLoading(true);
         try {
-            // Consulta base: solo productos disponibles
-            let q = _supabase
-                .from('productos')
-                .select('*')
-                .eq('disponible', true);
-
-            // Aplicar filtro si no es "Todos"
-            if (categoria !== 'Todos') {
-                q = q.eq('categoria', categoria);
-            }
+            let q = _supabase.from('productos').select('*').eq('disponible', true);
+            if (categoria !== 'Todos') q = q.eq('categoria', categoria);
             
-            // Ordenar por los más recientes
             const { data, error } = await q.order('created_at', { ascending: false });
-            
             if (error) throw error;
             setProductos(data || []);
-            
         } catch (err) {
-            console.error("Error al conectar con Supabase:", err.message);
+            console.error("Error:", err.message);
         } finally {
             setLoading(false);
         }
     }
 
     return (
-        <div>
-            {/* Navegación Fija */}
+        <div className="app-container">
+            {/* Barra de Navegación con Sombra sutil */}
             <nav className="nav-container">
-                <a href="#" className="logo">DORIS</a>
-                <div className="nav-links">
-                    {['Todos', 'Bebé', 'Niño', 'Niña', 'Hombre', 'Mujer'].map(cat => (
-                        <button 
-                            key={cat} 
-                            className={`filter-btn ${categoria === cat ? 'active' : ''}`}
-                            onClick={() => setCategoria(cat)}
-                        >
-                            {cat.toUpperCase()}
-                        </button>
-                    ))}
+                <div className="nav-content">
+                    <a href="#" className="logo">DORIS</a>
+                    <div className="nav-links">
+                        {['Todos', 'Bebé', 'Niño', 'Niña', 'Hombre', 'Mujer'].map(cat => (
+                            <button 
+                                key={cat} 
+                                className={`filter-btn ${categoria === cat ? 'active' : ''}`}
+                                onClick={() => setCategoria(cat)}
+                            >
+                                {cat}
+                            </button>
+                        ))}
+                    </div>
                 </div>
             </nav>
 
-            {/* Cabecera Estilo Editorial */}
-            <header className="hero">
-                <div className="hero-content">
-                    <span>EST. 2026</span>
-                    <h1>Elegancia <br/><i>Reencontrada</i></h1>
+            {/* Banner Principal con Overlay */}
+            <header className="hero-section">
+                <div className="hero-overlay">
+                    <div className="hero-text">
+                        <span className="badge">CURADURÍA AMERICANA</span>
+                        <h1>La Tiendita de Doris</h1>
+                        <p>Moda con historia, seleccionada para ti.</p>
+                    </div>
                 </div>
             </header>
 
-            {/* Contenedor de Productos */}
             <main className="main-content">
                 {loading ? (
-                    <div style={{textAlign: 'center', padding: '100px 0'}}>
-                        <p style={{letterSpacing: '5px', fontSize: '0.8rem', opacity: 0.6}}>
-                            CURANDO SELECCIÓN...
-                        </p>
+                    <div className="loader-container">
+                        <div className="spinner"></div>
+                        <p>Cargando tesoros...</p>
                     </div>
                 ) : (
                     <div className="product-grid">
-                        {productos.length === 0 ? (
-                            <p style={{ gridColumn: '1/-1', textAlign: 'center', opacity: 0.5 }}>
-                                No hay piezas disponibles en esta categoría por ahora.
-                            </p>
-                        ) : (
-                            productos.map((p, i) => (
-                                <article 
-                                    key={p.id} 
-                                    className="product-card" 
-                                    /* El efecto asimétrico: las tarjetas impares se desplazan hacia abajo */
-                                    style={{ transform: i % 2 !== 0 ? 'translateY(60px)' : 'none' }}
-                                >
-                                    <span className="category-tag">{p.categoria}</span>
-                                    
-                                    <div className="image-box">
-                                        <img 
-                                            src={p.imagen_url} 
-                                            alt={p.nombre} 
-                                            loading="lazy" 
-                                        />
+                        {productos.map((p) => (
+                            <article key={p.id} className="product-card">
+                                <div className="card-image">
+                                    <img src={p.imagen_url} alt={p.nombre} loading="lazy" />
+                                    <div className="card-tag">{p.categoria}</div>
+                                </div>
+                                <div className="card-info">
+                                    <div className="info-header">
+                                        <h3>{p.nombre}</h3>
+                                        <span className="price">₡{p.precio.toLocaleString()}</span>
                                     </div>
-
-                                    <div className="card-meta">
-                                        <div>
-                                            <h3>{p.nombre}</h3>
-                                            <p>PIEZA ÚNICA</p>
-                                        </div>
-                                        <span className="card-price">
-                                            ₡{p.precio ? p.precio.toLocaleString() : '0'}
-                                        </span>
-                                    </div>
-                                </article>
-                            ))
-                        )}
+                                    <p className="description">Pieza única seleccionada a mano</p>
+                                    <button className="view-btn">Ver Detalles</button>
+                                </div>
+                            </article>
+                        ))}
                     </div>
                 )}
             </main>
 
-            {/* Pie de página elegante */}
-            <footer className="footer">
-                <h2>DORIS</h2>
-                <p>GUÁPILES, COSTA RICA</p>
+            <footer className="main-footer">
+                <div className="footer-content">
+                    <div className="footer-logo">DORIS</div>
+                    <p>© 2026 Guápiles, Limón. Costa Rica</p>
+                </div>
             </footer>
         </div>
     );
 }
 
-// Renderizado final para React 18 en el navegador
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(<App />);
