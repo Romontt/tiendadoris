@@ -1,76 +1,91 @@
-/* Añade o actualiza esto en tu estilos.css */
-
-.hero {
-  background-color: var(--verde-oscuro);
-  min-height: 50vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  overflow: hidden;
+:root {
+  --verde-oscuro: #1b3022;
+  --azul-noche: #0a192f;
+  --naranja-tierra: #d46a4e;
+  --crema: #f4f1ea;
 }
 
-.hero-accent {
-  width: 60px;
-  height: 2px;
-  background-color: var(--naranja-tierra);
-  margin: 20px auto 0;
+body {
+  margin: 0;
+  background-color: var(--crema);
+  font-family: 'Montserrat', sans-serif;
+  color: var(--azul-noche);
 }
 
-.section-header {
+.nav-container {
+  background: var(--azul-noche);
+  padding: 20px 5%;
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
-  margin-bottom: 50px;
-  border-bottom: 1px solid rgba(0,0,0,0.1);
-  padding-bottom: 15px;
+  align-items: center;
+  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
-.category-title {
+.logo {
   font-family: 'Cormorant Garamond', serif;
-  font-size: 2rem;
-  margin: 0;
+  font-size: 1.8rem;
+  letter-spacing: 5px;
 }
 
-.product-count {
-  font-size: 0.8rem;
+.btn-cat {
+  background: none;
+  border: none;
+  color: white;
+  margin-left: 15px;
+  cursor: pointer;
+  font-size: 0.7rem;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  opacity: 0.5;
+  letter-spacing: 2px;
+  opacity: 0.6;
 }
 
-/* Mejora de la Card */
+.btn-cat.active {
+  opacity: 1;
+  border-bottom: 1px solid var(--naranja-tierra);
+}
+
+.hero {
+  background: var(--verde-oscuro);
+  color: white;
+  padding: 80px 10%;
+  text-align: center;
+}
+
+.hero h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 4rem;
+  font-style: italic;
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 50px;
+  padding: 50px 10%;
+}
+
 .image-wrapper {
   position: relative;
   aspect-ratio: 3/4;
-  background-color: #eee;
-  box-shadow: 15px 15px 0px var(--verde-oscuro); /* Cambié a verde para variar */
-  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+  box-shadow: 15px 15px 0px var(--naranja-tierra);
+  background: #ddd;
 }
 
-.product-card:hover .image-wrapper {
-  transform: translate(-5px, -5px);
-  box-shadow: 20px 20px 0px var(--naranja-tierra);
+.image-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
-.card-badge {
-  position: absolute;
-  top: 15px;
-  left: 15px;
-  background: var(--azul-noche);
-  color: white;
-  padding: 5px 10px;
-  font-size: 0.6rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+.card-info h3 {
+  font-family: 'Cormorant Garamond', serif;
+  margin-top: 25px;
 }
 
-.loading-text {
-  animation: pulse 1.5s infinite;
-}
-
-@keyframes pulse {
-  0% { opacity: 0.4; }
-  50% { opacity: 1; }
-  100% { opacity: 0.4; }
+.price {
+  color: var(--naranja-tierra);
+  font-weight: 600;
 }
