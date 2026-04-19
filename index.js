@@ -3,84 +3,74 @@ const { useState, useEffect } = React;
 function App() {
     const [productos, setProductos] = useState([]);
     const [categoria, setCategoria] = useState('Todos');
-    const [loading, setLoading] = useState(true);
 
     const _supabase = supabase.createClient(
         'https://hvnpkljyoocqdzwdptgt.supabase.co',
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2bnBrbGp5b29jcWR6d2RwdGd0Iiwicm9sZSI6Imh2bnBrbGp5b29jcWR6d2RwdGd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2MTAxMTQsImV4cCI6MjA5MjE4NjExNH0.-pq3iVzqJsJCyGNXkFPlHSIQeBTrr7i7ptsY6FYjJZ0'
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2bnBrbGp5b29jcWR6d2RwdGd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2MTAxMTQsImV4cCI6MjA5MjE4NjExNH0.-pq3iVzqJsJCyGNXkFPlHSIQeBTrr7i7ptsY6FYjJZ0'
     );
-
-    useEffect(() => { fetchData(); }, [categoria]);
-
-    async function fetchData() {
-        setLoading(true);
-        let q = _supabase.from('productos').select('*').eq('disponible', true);
-        if (categoria !== 'Todos') q = q.eq('categoria', categoria);
-        const { data } = await q.order('created_at', { ascending: false });
-        setProductos(data || []);
-        setLoading(false);
-    }
 
     return (
         <div>
-            {/* Nav Lateral Estilo Boutique Europa */}
+            {/* Nav Superior */}
             <nav className="nav-container">
-                <div className="logo-vertical">Doris Boutique</div>
-                <div style={{fontSize: '0.6rem', opacity: 0.5}}>© 2026</div>
+                <div className="logo">DORIS</div>
+                <div className="filter-bar" style={{padding: 0, margin: 0}}>
+                    {['Todos', 'Bebé', 'Niño', 'Niña', 'Hombre', 'Mujer'].map(cat => (
+                        <button 
+                            key={cat} 
+                            className={`filter-btn ${categoria === cat ? 'active' : ''}`}
+                            onClick={() => setCategoria(cat)}
+                        >
+                            {cat}
+                        </button>
+                    ))}
+                </div>
             </nav>
 
-            {/* Filtros en la parte superior derecha */}
-            <div className="filters">
-                {['Todos', 'Bebé', 'Niño', 'Niña', 'Hombre', 'Mujer'].map(cat => (
-                    <button 
-                        key={cat} 
-                        className={`filter-item ${categoria === cat ? 'active' : ''}`}
-                        onClick={() => setCategoria(cat)}
-                    >
-                        {cat}
-                    </button>
-                ))}
+            {/* Encabezado Terciopelo */}
+            <header className="hero-velvet">
+                <p style={{color: 'var(--dorado-relieve)', letterSpacing: '8px', fontSize: '0.8rem', marginBottom: '20px'}}>EST. 2026</p>
+                <h1>Elegancia <i>Reencontrada</i></h1>
+                <div className="ornament"></div>
+            </header>
+
+            {/* Sección Decorativa Central */}
+            <div className="center-piece">
+                <img 
+                    src="https://cdn-icons-png.flaticon.com/512/1014/1014732.png" 
+                    className="mannequin-icon" 
+                    alt="Decoración"
+                    style={{filter: 'sepia(0.5)'}}
+                />
+                <p style={{
+                    fontFamily: 'Cormorant Garamond', 
+                    fontStyle: 'italic', 
+                    fontSize: '1.5rem',
+                    opacity: 0.6
+                }}>
+                    Próximamente: Una selección exclusiva para ti
+                </p>
             </div>
 
-            <main className="main-wrapper">
-                {loading ? (
-                    <div style={{height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                        <p style={{letterSpacing: '10px'}}>CARGANDO EXPERIENCIA...</p>
-                    </div>
-                ) : (
-                    productos.map((p, index) => (
-                        <section 
-                            key={p.id} 
-                            className="product-section"
-                            style={{ flexDirection: index % 2 === 0 ? 'row' : 'row-reverse' }}
-                        >
-                            <div className="image-half">
-                                <img src={p.imagen_url} alt={p.nombre} />
-                            </div>
-                            <div className="content-half">
-                                <span className="cat-label">{p.categoria}</span>
-                                <h2 className="product-title">{p.nombre}</h2>
-                                <div className="price-box">
-                                    ₡{p.precio.toLocaleString()}
-                                </div>
-                                <button style={{
-                                    marginTop: '50px', 
-                                    padding: '15px 30px', 
-                                    background: 'var(--verde-boutique)', 
-                                    color: 'white', 
-                                    border: 'none',
-                                    letterSpacing: '3px',
-                                    fontSize: '0.7rem',
-                                    cursor: 'pointer',
-                                    width: 'fit-content'
-                                }}>
-                                    CONSULTAR PIEZA
-                                </button>
-                            </div>
-                        </section>
-                    ))
-                )}
+            {/* Espacio para Productos (Cuando tengas ropa) */}
+            <main style={{padding: '0 8% 100px', textAlign: 'center'}}>
+                <div style={{
+                    border: '1px solid rgba(197,160,89,0.3)', 
+                    padding: '100px', 
+                    borderRadius: '2px'
+                }}>
+                    <p style={{letterSpacing: '5px', opacity: 0.4}}>EL ESCAPARATE SE ESTÁ PREPARANDO</p>
+                </div>
             </main>
+
+            <footer style={{
+                textAlign: 'center', 
+                padding: '60px', 
+                background: 'var(--verde-imperial)', 
+                color: 'var(--crema-tapiz)'
+            }}>
+                <p style={{letterSpacing: '10px', fontSize: '0.7rem'}}>GUÁPILES • COSTA RICA</p>
+            </footer>
         </div>
     );
 }
