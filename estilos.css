@@ -1,173 +1,140 @@
 :root {
-    --verde-boutique: #0d211a;
-    --oro-viejo: #b5945d;
-    --azul-profundo: #050a14;
-    --blanco-hueso: #f4f1ea;
-    --shadow-soft: 0 20px 40px rgba(0,0,0,0.05);
+    --verde-boutique: #0a1f16;
+    --dorado-soft: #c5a059;
+    --crema: #f8f5f0;
+    --negro: #050505;
 }
 
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
 body {
-    background-color: var(--blanco-hueso);
+    background-color: var(--crema);
     font-family: 'Montserrat', sans-serif;
-    color: var(--verde-boutique);
-    margin: 0;
+    color: var(--negro);
     overflow-x: hidden;
 }
 
-/* Navbar Minimalista y Transparente */
+/* Navegación Vertical Minimalista */
 .nav-container {
     position: fixed;
+    left: 0;
     top: 0;
-    width: 100%;
-    z-index: 1000;
-    padding: 30px 5%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    mix-blend-mode: difference; /* Esto hace que el logo cambie de color según el fondo */
-}
-
-.logo {
-    color: white;
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 2rem;
-    letter-spacing: 10px;
-    font-weight: 300;
-}
-
-/* HERO: Diseño Editorial con Capas */
-.hero {
     height: 100vh;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    align-items: center;
-    background: var(--verde-boutique);
-    color: var(--blanco-hueso);
-    position: relative;
-}
-
-.hero-text {
-    padding-left: 15%;
-    z-index: 2;
-}
-
-.hero-text h1 {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(4rem, 12vw, 8rem);
-    line-height: 0.8;
-    margin: 0;
-}
-
-.hero-text h1 i { font-style: italic; font-weight: 300; }
-
-.hero-image {
-    height: 80%;
-    width: 80%;
-    background: url('https://images.unsplash.com/photo-1539109136881-3be0616acf4b?q=80&w=1887') no-repeat center;
-    background-size: cover;
-    justify-self: center;
-    clip-path: inset(0 0 0 0); /* Efecto de marco */
-    transition: 1s cubic-bezier(0.19, 1, 0.22, 1);
-}
-
-/* FILTROS: Barra Flotante Elevada */
-.filter-wrapper {
-    position: sticky;
-    top: 100px;
-    z-index: 10;
+    width: 80px;
+    border-right: 1px solid rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
     padding: 40px 0;
-    text-align: center;
-    background: linear-gradient(to bottom, var(--blanco-hueso) 80%, transparent);
+    align-items: center;
+    background: var(--crema);
+    z-index: 1000;
 }
 
-.filter-btn {
-    border: none;
-    background: none;
-    margin: 0 20px;
-    font-size: 0.7rem;
-    letter-spacing: 4px;
+.logo-vertical {
+    writing-mode: vertical-rl;
     text-transform: uppercase;
-    cursor: pointer;
-    opacity: 0.4;
-    transition: 0.4s;
+    letter-spacing: 8px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.5rem;
+    color: var(--verde-boutique);
 }
 
-.filter-btn.active {
-    opacity: 1;
-    color: var(--oro-viejo);
+/* Layout de Pantalla Partida (Split Screen) */
+.main-wrapper {
+    margin-left: 80px; /* Espacio para la nav vertical */
 }
 
-/* GRID: Composición Asimétrica (Layout de Revista) */
-.main-content {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 100px 5%;
-}
-
-.product-grid {
-    display: grid;
-    grid-template-columns: repeat(12, 1fr); /* 12 columnas para control total */
-    gap: 150px 0;
-}
-
-/* Card Estilo "Museo" */
-.product-card {
-    grid-column: span 5; /* Ocupa 5 columnas de las 12 */
+.product-section {
+    height: 100vh;
+    display: flex;
     position: relative;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    scroll-snap-align: start;
 }
 
-.product-card:nth-child(even) {
-    grid-column: 8 / span 5; /* Los pares se mueven a la derecha */
-    margin-top: 100px;
-}
-
-.image-holder {
-    position: relative;
-    width: 100%;
-    aspect-ratio: 3/4;
+/* Mitad Imagen */
+.image-half {
+    flex: 1;
     overflow: hidden;
-    background: #e0e0e0;
-    box-shadow: var(--shadow-soft);
+    position: relative;
 }
 
-.image-holder img {
+.image-half img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: 1.5s cubic-bezier(0.19, 1, 0.22, 1);
+    transition: transform 2s ease;
 }
 
-.product-card:hover .image-holder img {
+.product-section:hover .image-half img {
     transform: scale(1.1);
 }
 
-/* Decoración detrás de la imagen (Depth) */
-.product-card::before {
-    content: '';
-    position: absolute;
-    top: -30px;
-    left: -30px;
-    width: 100px;
-    height: 100px;
-    border-left: 1px solid var(--oro-viejo);
-    border-top: 1px solid var(--oro-viejo);
-    opacity: 0.5;
+/* Mitad Contenido */
+.content-half {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 10%;
+    background: var(--crema);
 }
 
-.product-info {
-    padding: 30px 0;
+.cat-label {
+    font-size: 0.7rem;
+    letter-spacing: 5px;
+    color: var(--dorado-soft);
+    margin-bottom: 20px;
+    text-transform: uppercase;
 }
 
-.product-info h3 {
+.product-title {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 2rem;
-    margin: 0;
-    font-weight: 400;
+    font-size: clamp(3rem, 6vw, 5rem);
+    line-height: 0.9;
+    margin-bottom: 30px;
+    font-style: italic;
 }
 
-.price {
-    font-size: 0.9rem;
+.price-box {
+    font-size: 1.2rem;
+    font-weight: 300;
     letter-spacing: 2px;
-    color: var(--oro-viejo);
-    margin-top: 10px;
+    border-top: 1px solid var(--negro);
+    padding-top: 20px;
+    display: inline-block;
+    width: fit-content;
+}
+
+/* Filtros Flotantes Horizontales */
+.filters {
+    position: fixed;
+    top: 30px;
+    right: 50px;
+    z-index: 1001;
+    display: flex;
+    gap: 30px;
+}
+
+.filter-item {
+    background: none;
+    border: none;
+    font-size: 0.6rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    cursor: pointer;
+    color: var(--negro);
+    opacity: 0.4;
+    transition: 0.3s;
+}
+
+.filter-item.active {
+    opacity: 1;
+    font-weight: bold;
+}
+
+/* Scroll Snap para que se sienta como una presentación */
+html {
+    scroll-snap-type: y mandatory;
 }
