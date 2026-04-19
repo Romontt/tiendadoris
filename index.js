@@ -10,15 +10,12 @@ function App() {
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2bnBrbGp5b29jcWR6d2RwdGd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2MTAxMTQsImV4cCI6MjA5MjE4NjExNH0.-pq3iVzqJsJCyGNXkFPlHSIQeBTrr7i7ptsY6FYjJZ0'
     );
 
-    useEffect(() => {
-        fetchData();
-    }, [categoria]);
+    useEffect(() => { fetchData(); }, [categoria]);
 
     async function fetchData() {
         setLoading(true);
         let q = _supabase.from('productos').select('*').eq('disponible', true);
         if (categoria !== 'Todos') q = q.eq('categoria', categoria);
-        
         const { data } = await q.order('created_at', { ascending: false });
         setProductos(data || []);
         setLoading(false);
@@ -27,18 +24,19 @@ function App() {
     return (
         <div>
             <nav className="nav-container">
-                <div className="logo">Doris</div>
-                <div style={{fontSize: '0.7rem', letterSpacing: '3px'}}>COSTA RICA</div>
+                <div className="logo">DORIS</div>
+                <div className="cart-dummy" style={{color: 'white', letterSpacing: '2px', fontSize: '0.7rem'}}>COSTA RICA</div>
             </nav>
 
             <header className="hero">
-                <div style={{overflow: 'hidden'}}>
-                    <p style={{letterSpacing: '10px', fontSize: '0.6rem', marginBottom: '20px', color: '#0d211a'}}>NEW COLLECTION</p>
-                    <h1>Boutique <i>Moderne</i></h1>
+                <div className="hero-text">
+                    <p style={{letterSpacing: '10px', fontSize: '0.7rem', opacity: 0.6}}>BOUTIQUE EXCLUSIVE</p>
+                    <h1>Nueva <br/><i>Esencia</i></h1>
                 </div>
+                <div className="hero-image"></div>
             </header>
 
-            <div className="filter-bar">
+            <div className="filter-wrapper">
                 {['Todos', 'Bebé', 'Niño', 'Niña', 'Hombre', 'Mujer'].map(cat => (
                     <button 
                         key={cat} 
@@ -52,20 +50,18 @@ function App() {
 
             <main className="main-content">
                 {loading ? (
-                    <p style={{textAlign: 'center', letterSpacing: '10px', marginTop: '100px'}}>ESPERE...</p>
+                    <div style={{height: '50vh', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                        <p style={{letterSpacing: '15px', fontSize: '0.8rem'}}>REVELANDO...</p>
+                    </div>
                 ) : (
                     <div className="product-grid">
                         {productos.map((p, index) => (
-                            <article 
-                                key={p.id} 
-                                className="product-card"
-                                style={{ animationDelay: `${index * 0.1}s` }}
-                            >
-                                <div className="image-container">
+                            <article key={p.id} className="product-card">
+                                <div className="image-holder">
                                     <img src={p.imagen_url} alt={p.nombre} />
                                 </div>
                                 <div className="product-info">
-                                    <p style={{fontSize: '0.6rem', letterSpacing: '2px', opacity: 0.5}}>{p.categoria.toUpperCase()}</p>
+                                    <p style={{fontSize: '0.6rem', letterSpacing: '4px', opacity: 0.5}}>{p.categoria.toUpperCase()}</p>
                                     <h3>{p.nombre}</h3>
                                     <div className="price">₡{p.precio.toLocaleString()}</div>
                                 </div>
@@ -75,9 +71,9 @@ function App() {
                 )}
             </main>
 
-            <footer style={{padding: '150px 8% 50px', textAlign: 'center', borderTop: '1px solid #eee'}}>
-                <div className="logo" style={{fontSize: '1.2rem', marginBottom: '30px'}}>Doris</div>
-                <p style={{fontSize: '0.6rem', letterSpacing: '5px', opacity: 0.4}}>PRIVACIDAD / TÉRMINOS / 2026</p>
+            <footer style={{padding: '100px 5%', background: '#0d211a', color: '#f4f1ea', textAlign: 'center'}}>
+                <h2 style={{fontFamily: 'Cormorant Garamond', fontSize: '3rem', letterSpacing: '10px'}}>DORIS</h2>
+                <p style={{opacity: 0.4, fontSize: '0.7rem', marginTop: '20px'}}>EDICIÓN LIMITADA 2026</p>
             </footer>
         </div>
     );
