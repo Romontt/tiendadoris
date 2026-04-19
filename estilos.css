@@ -1,14 +1,12 @@
-/* Importar fuentes elegantes: Playfair para títulos, Montserrat para lectura */
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&family=Playfair+Display:ital,wght@0,700;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@200;400;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
 
 :root {
-  --primario: #d46a4e;      /* Terracota elegante */
-  --primario-dark: #b55036; 
-  --fondo: #faf9f6;         /* Un crema más "hueso", muy premium */
-  --texto: #1a1a1a;         /* Un negro casi puro para contraste */
-  --texto-suave: #636e72;
-  --blanco: #ffffff;
-  --borde: rgba(212, 106, 78, 0.1);
+  --primario: #d46a4e;      
+  --fondo: #ffffff;         /* Blanco puro para máxima limpieza */
+  --acentos: #f4f1ea;       /* Color arena suave para fondos de imagen */
+  --texto: #000000;         /* Negro absoluto para elegancia */
+  --texto-suave: #888888;
+  --espaciado-seccion: 120px;
 }
 
 body {
@@ -16,35 +14,32 @@ body {
   color: var(--texto);
   font-family: 'Montserrat', sans-serif;
   margin: 0;
-  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
-/* --- HEADER Y NAVEGACIÓN --- */
+/* --- HEADER MINIMALISTA --- */
 header {
-  background-color: rgba(250, 249, 246, 0.95);
-  backdrop-filter: blur(10px);
-  padding: 1.5rem 0;
+  padding: 40px 0;
+  background: #fff;
+  border-bottom: 1px solid #f0f0f0;
   position: sticky;
   top: 0;
   z-index: 1000;
-  border-bottom: 1px solid var(--borde);
-  text-align: center;
 }
 
 .logo {
   font-family: 'Playfair Display', serif;
-  font-size: 2.2rem;
-  font-weight: 700;
-  color: var(--primario);
-  margin-bottom: 1rem;
-  letter-spacing: -0.5px;
+  font-size: 2.5rem;
+  font-weight: 400; /* Menos peso = más elegancia */
+  letter-spacing: -1px;
+  margin-bottom: 20px;
+  text-align: center;
 }
 
 nav {
   display: flex;
   justify-content: center;
-  gap: 25px;
-  margin-top: 15px;
+  gap: 40px;
 }
 
 nav button {
@@ -53,125 +48,114 @@ nav button {
   font-family: 'Montserrat', sans-serif;
   font-weight: 400;
   text-transform: uppercase;
-  font-size: 0.75rem;
-  letter-spacing: 1.5px;
+  font-size: 0.7rem;
+  letter-spacing: 3px; /* Espaciado extra en letras para lujo */
   cursor: pointer;
-  color: var(--texto-suave);
-  position: relative;
-  transition: color 0.3s;
-  padding: 5px 0;
+  color: var(--texto);
+  transition: opacity 0.3s;
 }
 
 nav button:hover {
-  color: var(--primario);
+  opacity: 0.5; /* Efecto desvanecido en lugar de cambio de color */
 }
 
-/* Línea animada debajo de los botones del menú */
-nav button::after {
-  content: '';
-  position: absolute;
-  width: 0;
-  height: 1px;
-  bottom: 0;
-  left: 0;
-  background-color: var(--primario);
-  transition: width 0.3s;
-}
-
-nav button:hover::after {
-  width: 100%;
-}
-
-/* --- HERO SECTION --- */
+/* --- HERO EDITORIAL --- */
 .hero {
-  padding: 100px 20px;
+  padding: var(--espaciado-seccion) 20px;
   text-align: center;
+  max-width: 800px;
+  margin: 0 auto;
 }
 
 .hero h1 {
   font-family: 'Playfair Display', serif;
-  font-size: 3.5rem;
+  font-size: 4.5rem; /* Gigante y elegante */
+  font-weight: 400;
   font-style: italic;
-  margin-bottom: 10px;
-  color: var(--texto);
+  line-height: 1;
+  margin-bottom: 20px;
 }
 
 .hero p {
-  font-weight: 300;
-  font-size: 1.1rem;
-  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 4px;
   color: var(--texto-suave);
 }
 
-/* --- GRID DE PRODUCTOS --- */
+/* --- GRID DE EXPOSICIÓN --- */
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 40px; /* Más espacio entre tarjetas para que respiren */
-  padding: 40px;
-  max-width: 1400px;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); /* Tarjetas más grandes */
+  gap: 60px; /* Mucho aire entre productos */
+  padding: 0 60px 100px 60px;
+  max-width: 1600px;
   margin: 0 auto;
 }
 
-/* --- TARJETA ELEGANTE --- */
+/* --- TARJETA DE LUJO --- */
 .card {
-  background: transparent; /* Sin fondo para un look más limpio */
-  border-radius: 0; /* Bordes rectos suelen verse más "editorial/moda" */
-  overflow: hidden;
-  transition: all 0.4s ease;
+  text-decoration: none;
+  color: inherit;
 }
 
 .card-img-container {
+  aspect-ratio: 3 / 4; /* Proporción de revista de moda */
+  background-color: var(--acentos);
   overflow: hidden;
-  position: relative;
-  background-color: #eee;
+  margin-bottom: 25px;
 }
 
 .card img {
   width: 100%;
-  height: 400px;
+  height: 100%;
   object-fit: cover;
-  transition: transform 0.8s cubic-bezier(0.2, 1, 0.3, 1);
+  filter: grayscale(20%); /* Un toque artístico sutil */
+  transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1), filter 0.5s;
 }
 
 .card:hover img {
-  transform: scale(1.05); /* Zoom muy sutil */
+  transform: scale(1.03);
+  filter: grayscale(0%);
 }
 
 .card-info {
-  padding: 20px 0; /* Sin padding lateral para alinear con la imagen */
-  text-align: left; /* Alineado a la izquierda es más elegante */
+  text-align: center; /* Centrado para look boutique */
 }
 
 .card-info h3 {
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem;
   font-weight: 400;
-  font-size: 1rem;
-  margin: 0 0 8px 0;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+  margin: 0 0 10px 0;
 }
 
 .card-info .precio {
-  font-weight: 600;
-  font-size: 1.1rem;
-  color: var(--primario);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 200;
+  letter-spacing: 2px;
+  color: var(--texto-suave);
 }
 
-/* --- BOTÓN DE CARRITO ICONO --- */
+/* --- CARRITO MINIMAL --- */
 .cart-icon {
   position: fixed;
-  right: 30px;
-  bottom: 30px;
-  background: var(--primario);
+  right: 50px;
+  bottom: 50px;
+  background: var(--texto); /* Negro sólido */
   color: white;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  border-radius: 0; /* Cuadrado para look moderno */
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 10px 20px rgba(212, 106, 78, 0.3);
   cursor: pointer;
   z-index: 999;
+  transition: transform 0.3s;
+}
+
+.cart-icon:hover {
+  transform: scale(1.1);
 }
