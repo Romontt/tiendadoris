@@ -1,43 +1,184 @@
 :root {
-  --primario: #d46a4e; /* Terracota */
-  --fondo: #f9f7f2;    /* Crema suave */
+  --primario: #d46a4e;      /* Terracota */
+  --primario-dark: #b85a42;
+  --fondo: #f9f7f2;         /* Crema suave */
   --texto: #2d3436;
+  --texto-light: #636e72;
   --blanco: #ffffff;
+  --shadow: 0 8px 30px rgba(0,0,0,0.08);
+  --radius: 16px;
 }
 
 body {
   background-color: var(--fondo);
   color: var(--texto);
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Poppins', 'Segoe UI', system-ui, sans-serif;
   margin: 0;
+  line-height: 1.6;
 }
 
+/* --- Navegación Superior --- */
+header {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px); /* Efecto vidrio empañado */
+  padding: 1.5rem;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  border-bottom: 1px solid rgba(212, 106, 78, 0.1);
+  text-align: center;
+}
+
+.logo-container h1 {
+  font-family: 'Playfair Display', serif; /* Fuente elegante para el nombre */
+  color: var(--primario);
+  margin: 0 0 1rem 0;
+  letter-spacing: 1px;
+  font-size: 2rem;
+}
+
+.nav-filters {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.btn-filter {
+  background: var(--blanco);
+  border: 1px solid #eee;
+  padding: 8px 20px;
+  border-radius: 30px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  color: var(--texto-light);
+}
+
+.btn-filter:hover, .btn-filter.active {
+  background: var(--primario);
+  color: white;
+  border-color: var(--primario);
+  box-shadow: 0 4px 12px rgba(212, 106, 78, 0.2);
+}
+
+/* --- Hero / Banner --- */
+.hero {
+  padding: 80px 20px;
+  text-align: center;
+  background: linear-gradient(rgba(212, 106, 78, 0.05), rgba(212, 106, 78, 0.1));
+  margin-bottom: 40px;
+}
+
+.hero h2 {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  color: var(--texto);
+}
+
+/* --- Grid de Productos --- */
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 20px;
-  padding: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 30px;
+  padding: 0 40px 40px 40px;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
+/* --- Tarjeta de Producto (Mejorada) --- */
 .card {
   background: var(--blanco);
-  border-radius: 12px;
+  border-radius: var(--radius);
   overflow: hidden;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-  transition: transform 0.2s;
+  box-shadow: var(--shadow);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border: 1px solid rgba(0,0,0,0.03);
+  position: relative;
 }
 
 .card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-12px);
+  box-shadow: 0 15px 45px rgba(0,0,0,0.12);
+}
+
+.image-wrapper {
+  position: relative;
+  overflow: hidden;
 }
 
 .card img {
   width: 100%;
-  height: 300px;
-  object-fit: cover; /* Esto hace que fotos de diferentes tamaños se vean iguales */
+  height: 380px;
+  object-fit: cover;
+  transition: transform 0.6s ease;
+}
+
+.card:hover img {
+  transform: scale(1.08);
 }
 
 .card-info {
-  padding: 15px;
-  text-align: center;
+  padding: 20px;
+  background: var(--blanco);
+}
+
+.card-category {
+  font-size: 0.75rem;
+  color: var(--primario);
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.card-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 12px 0;
+  color: var(--texto);
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #f1f1f1;
+  padding-top: 15px;
+}
+
+.price {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--texto);
+}
+
+.btn-add-cart {
+  background: var(--primario);
+  color: white;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  transition: background 0.3s ease;
+}
+
+.btn-add-cart:hover {
+  background: var(--primario-dark);
+}
+
+/* Responsivo para celulares */
+@media (max-width: 600px) {
+  .grid {
+    grid-template-columns: 1fr 1fr; /* Dos columnas en móvil */
+    gap: 15px;
+    padding: 15px;
+  }
+  .card img { height: 200px; }
+  .hero h2 { font-size: 1.8rem; }
 }
