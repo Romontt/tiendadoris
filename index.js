@@ -1,6 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { createRoot } from 'react-dom/client';
-import { supabase } from './lib/supabase';
+// Sacamos las funciones que ocupamos de las librerías globales
+const { useState, useEffect } = React;
+
+// CONFIGURA TU SUPABASE AQUÍ
+const _supabase = supabase.createClient(
+  'TU_URL_DE_SUPABASE', 
+  'TU_API_KEY_ANONIMA'
+);
 
 function App() {
   const [productos, setProductos] = useState([]);
@@ -16,26 +21,21 @@ function App() {
   async function fetchProductos() {
     setCargando(true);
     try {
-      let query = supabase.from('productos').select('*').eq('disponible', true);
-      
-      if (categoria !== 'Todos') {
-        query = query.eq('categoria', categoria);
-      }
+      let query = _supabase.from('productos').select('*').eq('disponible', true);
+      if (categoria !== 'Todos') query = query.eq('categoria', categoria);
       
       const { data, error } = await query.order('created_at', { ascending: false });
-      
       if (error) throw error;
       setProductos(data || []);
-    } catch (error) {
-      console.error("Error cargando productos:", error.message);
+    } catch (err) {
+      console.error("Error:", err.message);
     } finally {
       setCargando(false);
     }
   }
 
   return (
-    // IMPORTANTE: Envolvemos todo en un Fragment <> o un div para evitar el error de sintaxis
-    <div className="boutique-container">
+    <div className="boutique-wrapper">
       <nav className="nav-container">
         <div className="logo">DORIS.</div>
         <div className="nav-menu">
@@ -60,15 +60,8 @@ function App() {
       </header>
 
       <main className="main-content">
-        <div className="section-header">
-          <h2 className="category-title">{categoria === 'Todos' ? 'Colección Completa' : categoria}</h2>
-          <span className="product-count">{productos.length} piezas únicas</span>
-        </div>
-
         {cargando ? (
-          <div className="loader-box">
-            <p className="loading-text">BUSCANDO PIEZAS...</p>
-          </div>
+          <div className="loader">Buscando en el archivo...</div>
         ) : (
           <div className="product-grid">
             {productos.map((p, index) => (
@@ -78,12 +71,11 @@ function App() {
                 style={{ marginTop: index % 2 !== 0 ? '60px' : '0' }}
               >
                 <div className="image-wrapper">
-                  <div className="image-overlay"></div>
-                  <img src={p.imagen_url} alt={p.nombre} loading="lazy" />
+                  <img src={p.imagen_url} alt={p.nombre} />
                   <span className="card-badge">{p.categoria}</span>
                 </div>
                 <div className="card-info">
-                  <h3 className="product-name">{p.nombre}</h3>
+                  <h3>{p.nombre}</h3>
                   <p className="price">₡{p.precio.toLocaleString()}</p>
                 </div>
               </article>
@@ -91,13 +83,10 @@ function App() {
           </div>
         )}
       </main>
-
-      <footer className="footer-simple">
-        <p>© 2026 La Americana de Doris — Guápiles, Pococí</p>
-      </footer>
     </div>
   );
 }
 
-const root = createRoot(document.getElementById('root'));
+// Renderizado final para navegador
+const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(<App />);
