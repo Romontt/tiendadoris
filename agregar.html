@@ -1,0 +1,35 @@
+<style>
+    /* Estilos de la tarjeta idénticos a la tienda */
+    .product-card-preview {
+        background: white; border-radius: 20px; overflow: hidden; width: 260px; margin: 0 auto;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.2); color: #333; text-align: left;
+    }
+    .img-box { width: 100%; height: 280px; background: #eee; position: relative; }
+    .badge { position: absolute; top: 10px; right: 10px; background: #d46a4e; color: white; padding: 5px 10px; border-radius: 10px; font-size: 0.7rem; font-weight: 700; }
+    .info { padding: 15px; }
+    .p-name { font-weight: 700; font-size: 0.95rem; margin: 0; color: #0d2c24; }
+    .p-price { color: #d46a4e; font-weight: 700; font-size: 1.1rem; }
+    .p-old { text-decoration: line-through; opacity: 0.5; font-size: 0.8rem; margin-right: 8px; }
+</style>
+
+{previewUrl && (
+    <div style={{marginTop: '30px', padding: '20px', background: 'rgba(0,0,0,0.2)', borderRadius: '20px'}}>
+        <label style={{textAlign: 'center', display: 'block', marginBottom: '15px'}}>VISTA PREVIA EN TIENDA</label>
+        <div className="product-card-preview">
+            <div className="img-box">
+                <img src={previewUrl} style={{width: '100%', height: '100%', objectFit: 'cover'}} />
+                {form.tiene_descuento && <div className="badge">OFERTA -{form.porcentaje_descuento}%</div>}
+            </div>
+            <div className="info">
+                <p style={{fontSize: '0.7rem', opacity: 0.6, textTransform: 'uppercase'}}>{form.categoria}</p>
+                <h3 className="p-name">{form.nombre || 'Nombre del Producto'}</h3>
+                <div style={{marginTop: '8px'}}>
+                    {form.tiene_descuento && <span className="p-old">₡{parseInt(form.precio).toLocaleString()}</span>}
+                    <span className="p-price">
+                        ₡{(form.tiene_descuento ? form.precio - (form.precio * (form.porcentaje_descuento/100)) : form.precio || 0).toLocaleString()}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+)}
