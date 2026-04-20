@@ -1,35 +1,226 @@
-<style>
-    /* Estilos de la tarjeta idénticos a la tienda */
-    .product-card-preview {
-        background: white; border-radius: 20px; overflow: hidden; width: 260px; margin: 0 auto;
-        box-shadow: 0 10px 20px rgba(0,0,0,0.2); color: #333; text-align: left;
-    }
-    .img-box { width: 100%; height: 280px; background: #eee; position: relative; }
-    .badge { position: absolute; top: 10px; right: 10px; background: #d46a4e; color: white; padding: 5px 10px; border-radius: 10px; font-size: 0.7rem; font-weight: 700; }
-    .info { padding: 15px; }
-    .p-name { font-weight: 700; font-size: 0.95rem; margin: 0; color: #0d2c24; }
-    .p-price { color: #d46a4e; font-weight: 700; font-size: 1.1rem; }
-    .p-old { text-decoration: line-through; opacity: 0.5; font-size: 0.8rem; margin-right: 8px; }
-</style>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agregar Producto | SUA Boutique</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root { 
+            --v-fondo: #0a1f1a; 
+            --v-card: #0d2c24; 
+            --naranja: #d46a4e; 
+            --texto: #f1f5f9;
+            --input-bg: #163d33;
+        }
+        
+        body { 
+            font-family: 'Outfit', sans-serif; 
+            background: var(--v-fondo); 
+            margin: 0; 
+            color: var(--texto);
+            min-height: 100vh;
+        }
 
-{previewUrl && (
-    <div style={{marginTop: '30px', padding: '20px', background: 'rgba(0,0,0,0.2)', borderRadius: '20px'}}>
-        <label style={{textAlign: 'center', display: 'block', marginBottom: '15px'}}>VISTA PREVIA EN TIENDA</label>
-        <div className="product-card-preview">
-            <div className="img-box">
-                <img src={previewUrl} style={{width: '100%', height: '100%', objectFit: 'cover'}} />
-                {form.tiene_descuento && <div className="badge">OFERTA -{form.porcentaje_descuento}%</div>}
-            </div>
-            <div className="info">
-                <p style={{fontSize: '0.7rem', opacity: 0.6, textTransform: 'uppercase'}}>{form.categoria}</p>
-                <h3 className="p-name">{form.nombre || 'Nombre del Producto'}</h3>
-                <div style={{marginTop: '8px'}}>
-                    {form.tiene_descuento && <span className="p-old">₡{parseInt(form.precio).toLocaleString()}</span>}
-                    <span className="p-price">
-                        ₡{(form.tiene_descuento ? form.precio - (form.precio * (form.porcentaje_descuento/100)) : form.precio || 0).toLocaleString()}
-                    </span>
+        .header { padding: 20px; display: flex; align-items: center; gap: 20px; background: rgba(0,0,0,0.2); }
+        .btn-back { text-decoration: none; color: var(--naranja); font-weight: 700; font-size: 0.9rem; }
+
+        .main-layout { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 40px; 
+            max-width: 1200px; 
+            margin: 40px auto; 
+            padding: 0 20px;
+        }
+
+        @media (max-width: 900px) { .main-layout { grid-template-columns: 1fr; } }
+
+        /* Formulario */
+        .form-card { background: var(--v-card); padding: 30px; border-radius: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.3); }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px; }
+        input, select { 
+            width: 100%; padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); 
+            background: var(--input-bg); color: white; font-family: inherit; box-sizing: border-box;
+        }
+
+        /* Estilos de la Tarjeta (Igual a la Tienda) */
+        .preview-sticky { position: sticky; top: 40px; text-align: center; }
+        .product-card { 
+            background: white; border-radius: 18px; overflow: hidden; width: 280px; 
+            margin: 0 auto; box-shadow: 0 20px 40px rgba(0,0,0,0.4); color: #333; text-align: left;
+        }
+        .img-container { width: 100%; height: 320px; background: #222; position: relative; overflow: hidden; }
+        .img-container img { width: 100%; height: 100%; object-fit: cover; transition: 0.3s; }
+        .badge-promo { 
+            position: absolute; top: 12px; right: 12px; background: var(--naranja); 
+            color: white; padding: 4px 10px; border-radius: 8px; font-size: 0.7rem; font-weight: 700;
+        }
+        .info { padding: 20px; }
+        .cat-tag { font-size: 0.65rem; color: #64748b; text-transform: uppercase; font-weight: 700; margin: 0; }
+        .p-title { font-size: 1rem; font-weight: 700; margin: 5px 0; color: #0d2c24; }
+        .price-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+        .price-now { color: var(--naranja); font-weight: 700; font-size: 1.2rem; }
+        .price-old { text-decoration: line-through; opacity: 0.4; font-size: 0.9rem; }
+
+        button.btn-pub { 
+            width: 100%; background: var(--naranja); color: white; border: none; 
+            padding: 16px; border-radius: 15px; font-weight: 700; cursor: pointer; margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        function AgregarProducto() {
+            const [loading, setLoading] = useState(false);
+            const [previewUrl, setPreviewUrl] = useState('');
+            const [imageFile, setImageFile] = useState(null);
+            const [form, setForm] = useState({
+                nombre: '', categoria: 'Bebé', tallas: '', precio: '',
+                tiene_descuento: false, porcentaje_descuento: 0
+            });
+
+            const _supabase = supabase.createClient(
+                'https://hvnpkljyoocqdzwdptgt.supabase.co',
+                'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2bnBrbGp5b29jcWR6d2RwdGd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2MTAxMTQsImV4cCI6MjA5MjE4NjExNH0.-pq3iVzqJsJCyGNXkFPlHSIQeBTrr7i7ptsY6FYjJZ0'
+            );
+
+            const handleFile = (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    setImageFile(file);
+                    setPreviewUrl(URL.createObjectURL(file));
+                }
+            };
+
+            const publicar = async (e) => {
+                e.preventDefault();
+                if(!imageFile) return alert("Sube una foto");
+                setLoading(true);
+
+                try {
+                    const fileName = `${Date.now()}_${imageFile.name}`;
+                    const { data: upData, error: upErr } = await _supabase.storage.from('productos').upload(fileName, imageFile);
+                    if (upErr) throw upErr;
+
+                    const { data: { publicUrl } } = _supabase.storage.from('productos').getPublicUrl(fileName);
+
+                    const finalPrice = form.tiene_descuento ? form.precio - (form.precio * (form.porcentaje_descuento / 100)) : null;
+
+                    const { error: dbErr } = await _supabase.from('productos').insert([{
+                        ...form,
+                        precio: parseFloat(form.precio),
+                        porcentaje_descuento: parseInt(form.porcentaje_descuento),
+                        precio_oferta: finalPrice,
+                        imagen_url: publicUrl,
+                        disponible: true
+                    }]);
+
+                    if (dbErr) throw dbErr;
+                    alert("¡Producto en línea!");
+                    window.location.href = 'admin.html';
+                } catch (err) { alert(err.message); }
+                finally { setLoading(false); }
+            };
+
+            const precioCalculado = form.tiene_descuento 
+                ? form.precio - (form.precio * (form.porcentaje_descuento / 100)) 
+                : form.precio;
+
+            return (
+                <div>
+                    <div className="header">
+                        <a href="admin.html" className="btn-back">← VOLVER AL MENÚ</a>
+                        <h2 style={{margin: 0, fontSize: '1.2rem'}}>Nueva Publicación</h2>
+                    </div>
+
+                    <div className="main-layout">
+                        {/* COLUMNA IZQUIERDA: FORMULARIO */}
+                        <form className="form-card" onSubmit={publicar}>
+                            <div className="form-group">
+                                <label>Nombre del Producto</label>
+                                <input type="text" placeholder="Ej: Mameluco Oso" required onChange={e => setForm({...form, nombre: e.target.value})} />
+                            </div>
+
+                            <div className="form-group">
+                                <label>Categoría</label>
+                                <select onChange={e => setForm({...form, categoria: e.target.value})}>
+                                    <option>Bebé</option>
+                                    <option>Niño</option>
+                                    <option>Niña</option>
+                                </select>
+                            </div>
+
+                            <div className="form-group">
+                                <label>Precio Original (₡)</label>
+                                <input type="number" placeholder="15000" required onChange={e => setForm({...form, precio: e.target.value})} />
+                            </div>
+
+                            <div className="form-group">
+                                <label>¿Aplicar Promoción?</label>
+                                <select onChange={e => setForm({...form, tiene_descuento: e.target.value === 'true'})}>
+                                    <option value="false">No</option>
+                                    <option value="true">Sí, aplicar descuento</option>
+                                </select>
+                            </div>
+
+                            {form.tiene_descuento && (
+                                <div className="form-group">
+                                    <label>Porcentaje de Descuento (%)</label>
+                                    <input type="number" placeholder="20" onChange={e => setForm({...form, porcentaje_descuento: e.target.value})} />
+                                </div>
+                            )}
+
+                            <div className="form-group">
+                                <label>Foto del Producto</label>
+                                <input type="file" accept="image/*" onChange={handleFile} />
+                            </div>
+
+                            <button type="submit" className="btn-pub" disabled={loading}>
+                                {loading ? 'Subiendo datos...' : 'Publicar en la Tienda'}
+                            </button>
+                        </form>
+
+                        {/* COLUMNA DERECHA: PREVIEW DE LA TARJETA */}
+                        <div className="preview-sticky">
+                            <label style={{marginBottom: '20px', display: 'block'}}>Vista Previa en Tiempo Real</label>
+                            <div className="product-card">
+                                <div className="img-container">
+                                    {previewUrl ? <img src={previewUrl} /> : <div style={{color: '#444', paddingTop: '140px', textAlign: 'center'}}>Esperando foto...</div>}
+                                    {form.tiene_descuento && form.porcentaje_descuento > 0 && (
+                                        <div className="badge-promo">-{form.porcentaje_descuento}%</div>
+                                    )}
+                                </div>
+                                <div className="info">
+                                    <p className="cat-tag">{form.categoria}</p>
+                                    <h3 className="p-title">{form.nombre || 'Nombre del Producto'}</h3>
+                                    <div className="price-row">
+                                        {form.tiene_descuento && (
+                                            <span className="price-old">₡{parseInt(form.precio || 0).toLocaleString()}</span>
+                                        )}
+                                        <span className="price-now">
+                                            ₡{parseInt(precioCalculado || 0).toLocaleString()}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <p style={{fontSize: '0.8rem', opacity: 0.5, marginTop: '20px'}}>* Así es como los clientes verán el producto en la web principal.</p>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-    </div>
-)}
+            );
+        }
+
+        ReactDOM.createRoot(document.getElementById('root')).render(<AgregarProducto />);
+    </script>
+</body>
+</html>
