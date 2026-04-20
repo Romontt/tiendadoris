@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin | SUA Boutique</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root { --verde: #0d2c24; --naranja: #d46a4e; }
+        body { font-family: 'Outfit', sans-serif; background: #fcfaf7; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .login-card { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); text-align: center; width: 90%; max-width: 400px; }
+        input { width: 100%; padding: 12px; margin: 20px 0; border: 1px solid #eee; border-radius: 10px; box-sizing: border-box; font-size: 1rem; text-align: center; }
+        button { background: var(--verde); color: white; border: none; padding: 12px 30px; border-radius: 25px; cursor: pointer; font-weight: 600; width: 100%; }
+        .admin-panel { background: white; width: 95%; max-width: 800px; padding: 30px; border-radius: 20px; display: none; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        function AdminApp() {
+            const [isLogged, setIsLogged] = useState(false);
+            const [pass, setPass] = useState('');
+            const [loading, setLoading] = useState(false);
+
+            const _supabase = supabase.createClient(
+                'https://hvnpkljyoocqdzwdptgt.supabase.co',
+                'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2bnBrbGp5b29jcWR6d2RwdGd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2MTAxMTQsImV4cCI6MjA5MjE4NjExNH0.-pq3iVzqJsJCyGNXkFPlHSIQeBTrr7i7ptsY6FYjJZ0'
+            );
+
+            const handleLogin = async () => {
+                setLoading(true);
+                const { data, error } = await _supabase
+                    .from('configuracion')
+                    .select('valor')
+                    .eq('clave', 'admin_token')
+                    .single();
+
+                if (data && data.valor === pass) {
+                    setIsLogged(true);
+                } else {
+                    alert('Palabra clave incorrecta');
+                }
+                setLoading(false);
+            };
+
+            if (!isLogged) {
+                return (
+                    <div className="login-card">
+                        <h2 style={{color: 'var(--verde)', letterSpacing: '2px'}}>SUA ADMIN</h2>
+                        <p style={{fontSize: '0.8rem', opacity: 0.6}}>Ingresa la palabra clave para gestionar el inventario</p>
+                        <input 
+                            type="password" 
+                            placeholder="Palabra clave" 
+                            value={pass}
+                            onChange={(e) => setPass(e.target.value)}
+                            onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
+                        />
+                        <button onClick={handleLogin} disabled={loading}>
+                            {loading ? 'Verificando...' : 'Entrar'}
+                        </button>
+                    </div>
+                );
+            }
+
+            return (
+                <div style={{width: '90%', maxWidth: '800px', background: 'white', padding: '30px', borderRadius: '20px', boxShadow: '0 10px 40px rgba(0,0,0,0.1)'}}>
+                    <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px'}}>
+                        <h2 style={{margin: 0, color: 'var(--verde)'}}>Panel de Control</h2>
+                        <button onClick={() => setIsLogged(false)} style={{width: 'auto', padding: '8px 20px', background: '#eee', color: '#666'}}>Salir</button>
+                    </div>
+                    
+                    <p>Bienvenido. Aquí configuraremos el formulario para subir tus fotos y precios.</p>
+                    {/* Próximo paso: Formulario de subida de productos */}
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<AdminApp />);
+    </script>
+</body>
+</html>
