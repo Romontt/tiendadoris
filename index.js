@@ -23,6 +23,12 @@ function App() {
         loadData();
     }, [cat]);
 
+    // Función para cambiar categoría y subir al inicio (usada en el footer)
+    const handleFooterNav = (nuevaCat) => {
+        setCat(nuevaCat);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
     return (
         <div className={`app-container tema-${cat}`}>
             <nav className="nav-bar">
@@ -68,6 +74,50 @@ function App() {
                     </article>
                 ))}
             </main>
+
+            <footer className="footer">
+                <div className="footer-content">
+                    {/* Columna 1: Marca y Ubicación */}
+                    <div className="footer-brand">
+                        <div className="sua-logo">SUA</div>
+                        <p className="footer-location">
+                            SUA KIDS / Guápiles - Pococí - Limón
+                        </p>
+                    </div>
+
+                    {/* Columna 2: Navegación Rápida */}
+                    <div className="footer-links">
+                        <h4>Colecciones</h4>
+                        <ul>
+                            {['Bebé', 'Niño', 'Niña'].map(c => (
+                                <li key={c}>
+                                    <button onClick={() => handleFooterNav(c)}>
+                                        {c}
+                                    </button>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+
+                    {/* Columna 3: Redes/Contacto */}
+                    <div className="footer-links">
+                        <h4>Contacto</h4>
+                        <ul>
+                            <li><button onClick={() => window.open('https://wa.me/50688888888')}>WhatsApp</button></li>
+                            <li><button>Instagram</button></li>
+                            <li><button>Facebook</button></li>
+                        </ul>
+                    </div>
+                </div>
+
+                {/* Parte Inferior: Créditos y Año */}
+                <div className="footer-bottom">
+                    <div>© 2026 SUA Boutique. Todos los derechos reservados.</div>
+                    <div className="designer-credit">
+                        DISEÑADO POR <span style={{color: 'white', fontWeight: '700'}}>MONTZUCR</span>
+                    </div>
+                </div>
+            </footer>
         </div>
     );
 }
