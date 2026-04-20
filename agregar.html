@@ -64,6 +64,7 @@
         .info { padding: 20px; }
         .cat-tag { font-size: 0.65rem; color: #64748b; text-transform: uppercase; font-weight: 700; margin: 0; }
         .p-title { font-size: 1rem; font-weight: 700; margin: 5px 0; color: #0d2c24; }
+        .p-tallas { font-size: 0.75rem; color: #64748b; margin-bottom: 8px; }
         .price-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
         .price-now { color: var(--naranja); font-weight: 700; font-size: 1.2rem; }
         .price-old { text-decoration: line-through; opacity: 0.4; font-size: 0.9rem; }
@@ -161,6 +162,11 @@
                             </div>
 
                             <div className="form-group">
+                                <label>Tallas disponibles</label>
+                                <input type="text" placeholder="Ej: 2T, 4T, 6T" onChange={e => setForm({...form, tallas: e.target.value})} />
+                            </div>
+
+                            <div className="form-group">
                                 <label>Precio Original (₡)</label>
                                 <input type="number" placeholder="15000" required onChange={e => setForm({...form, precio: e.target.value})} />
                             </div>
@@ -203,6 +209,7 @@
                                 <div className="info">
                                     <p className="cat-tag">{form.categoria}</p>
                                     <h3 className="p-title">{form.nombre || 'Nombre del Producto'}</h3>
+                                    <p className="p-tallas">{form.tallas ? `Tallas: ${form.tallas}` : 'Tallas no especificadas'}</p>
                                     <div className="price-row">
                                         {form.tiene_descuento && (
                                             <span className="price-old">₡{parseInt(form.precio || 0).toLocaleString()}</span>
