@@ -47,7 +47,7 @@ function App() {
                         <span className="logo-text">Siwá</span>
                         <span className="logo-dot">.</span>
                     </div>
-                    <small className="logo-tagline">KIDS BOUTIQUE</small>
+                    <small className="logo-tagline">TIENDA VIRTUAL INFANTIL</small>
                 </div>
                 
                 <div className="nav-links">
