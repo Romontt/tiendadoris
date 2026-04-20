@@ -10,271 +10,58 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root { 
-            --verde-fondo: #0a1f1a; 
-            --verde-card: #0d2c24; 
-            --naranja: #d46a4e; 
-            --texto-claro: #f1f5f9;
-            --input-bg: #163d33;
-        }
-        
-        body { 
-            font-family: 'Outfit', sans-serif; 
-            background: var(--verde-fondo); 
-            margin: 0; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            min-height: 100vh; 
-            color: var(--texto-claro); 
-        }
-
-        /* Card Principal */
-        .admin-container, .login-card { 
-            background: var(--verde-card); 
-            width: 95%; 
-            max-width: 500px; 
-            padding: 40px; 
-            border-radius: 30px; 
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5); 
-            margin: 20px;
-            border: 1px solid rgba(255,255,255,0.05);
-        }
-
-        h2 { color: var(--naranja); letter-spacing: 1px; font-weight: 700; }
-
-        /* Formulario Estilizado */
-        .form-group { margin-bottom: 18px; display: flex; flex-direction: column; gap: 8px; }
-        label { font-weight: 500; font-size: 0.85rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; }
-        
-        input, select { 
-            width: 100%; 
-            padding: 14px; 
-            border: 1px solid rgba(255,255,255,0.1); 
-            border-radius: 12px; 
-            background: var(--input-bg);
-            color: white;
-            font-family: 'Outfit', sans-serif; 
-            font-size: 1rem; 
-            box-sizing: border-box; 
-            transition: 0.3s;
-        }
-
-        input:focus { outline: none; border-color: var(--naranja); box-shadow: 0 0 0 3px rgba(212, 106, 78, 0.2); }
-
-        .radio-group { display: flex; gap: 20px; padding: 10px 0; }
-        .radio-item { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.9rem; }
-
-        .discount-box { 
-            background: rgba(212, 106, 78, 0.1); 
-            padding: 20px; 
-            border-radius: 15px; 
-            border-left: 4px solid var(--naranja); 
-            margin-bottom: 20px;
-        }
-
-        /* Botones */
-        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 25px; }
-        button { 
-            background: var(--naranja); 
-            color: white; 
-            border: none; 
-            padding: 16px; 
-            border-radius: 15px; 
-            cursor: pointer; 
-            font-weight: 700; 
-            font-size: 1rem; 
-            transition: 0.3s; 
-        }
-
-        .btn-preview { background: rgba(255,255,255,0.1); color: var(--texto-claro); }
-        button:hover { transform: translateY(-2px); opacity: 0.9; }
-        button:disabled { background: #334155; color: #64748b; transform: none; }
-
-        /* Preview de Imagen */
-        .preview-img-container { 
-            margin-top: 20px; 
-            border-radius: 20px; 
-            overflow: hidden; 
-            background: #000; 
-            height: 250px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center;
-            border: 2px dashed rgba(255,255,255,0.1);
-        }
-        .preview-img { width: 100%; height: 100%; object-fit: cover; }
-        
-        input[type="file"] { padding: 10px; font-size: 0.8rem; background: transparent; border: none; }
+        :root { --v-fondo: #0a1f1a; --v-card: #0d2c24; --naranja: #d46a4e; }
+        body { font-family: 'Outfit', sans-serif; background: var(--v-fondo); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; color: #f1f5f9; }
+        .card { background: var(--v-card); width: 90%; max-width: 400px; padding: 40px; border-radius: 30px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); text-align: center; }
+        input { width: 100%; padding: 14px; margin: 15px 0; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: #163d33; color: white; box-sizing: border-box; }
+        button { width: 100%; padding: 16px; border-radius: 15px; border: none; background: var(--naranja); color: white; font-weight: 700; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+        .menu-grid { display: grid; gap: 20px; margin-top: 30px; }
+        .menu-opt { background: #163d33; padding: 25px; border-radius: 20px; text-decoration: none; color: white; border: 1px solid rgba(255,255,255,0.05); transition: 0.3s; }
+        .menu-opt:hover { border-color: var(--naranja); background: #1c4d41; }
     </style>
 </head>
 <body>
     <div id="root"></div>
-
     <script type="text/babel">
         const { useState } = React;
+        const _supabase = supabase.createClient('https://hvnpkljyoocqdzwdptgt.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2bnBrbGp5b29jcWR6d2RwdGd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2MTAxMTQsImV4cCI6MjA5MjE4NjExNH0.-pq3iVzqJsJCyGNXkFPlHSIQeBTrr7i7ptsY6FYjJZ0');
 
-        function AdminApp() {
+        function App() {
             const [isLogged, setIsLogged] = useState(false);
             const [pass, setPass] = useState('');
-            const [loading, setLoading] = useState(false);
-            const [previewUrl, setPreviewUrl] = useState(null);
-            const [imageFile, setImageFile] = useState(null);
-            
-            const [form, setForm] = useState({
-                nombre: '', categoria: 'Bebé', tallas: '', precio: '',
-                tiene_descuento: false, porcentaje_descuento: 0
-            });
 
-            const _supabase = supabase.createClient(
-                'https://hvnpkljyoocqdzwdptgt.supabase.co',
-                'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2bnBrbGp5b29jcWR6d2RwdGd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2MTAxMTQsImV4cCI6MjA5MjE4NjExNH0.-pq3iVzqJsJCyGNXkFPlHSIQeBTrr7i7ptsY6FYjJZ0'
+            const login = async () => {
+                const { data } = await _supabase.from('configuracion').select('valor').eq('clave', 'admin_token').single();
+                if (data?.valor === pass) setIsLogged(true);
+                else alert("Acceso denegado");
+            };
+
+            if (!isLogged) return (
+                <div className="card">
+                    <h2>SUA ADMIN</h2>
+                    <input type="password" placeholder="Palabra clave" onChange={e => setPass(e.target.value)} onKeyPress={e => e.key === 'Enter' && login()}/>
+                    <button onClick={login}>Entrar al Panel</button>
+                </div>
             );
 
-            const handleLogin = async () => {
-                setLoading(true);
-                const { data } = await _supabase.from('configuracion').select('valor').eq('clave', 'admin_token').single();
-                if (data && data.valor === pass) setIsLogged(true);
-                else alert('Palabra clave incorrecta');
-                setLoading(false);
-            };
-
-            const handleFileChange = (e) => {
-                const file = e.target.files[0];
-                if (file) {
-                    setImageFile(file);
-                    setPreviewUrl(URL.createObjectURL(file));
-                }
-            };
-
-            const handleSubmit = async (e) => {
-                e.preventDefault();
-                if (!imageFile) return alert("Por favor selecciona una foto");
-                setLoading(true);
-
-                try {
-                    const fileName = `${Date.now()}_${imageFile.name}`;
-                    const { data: uploadData, error: uploadError } = await _supabase.storage
-                        .from('productos')
-                        .upload(fileName, imageFile);
-
-                    if (uploadError) throw uploadError;
-
-                    const { data: { publicUrl } } = _supabase.storage.from('productos').getPublicUrl(fileName);
-
-                    const precioFinal = form.tiene_descuento 
-                        ? form.precio - (form.precio * (form.porcentaje_descuento / 100))
-                        : null;
-
-                    const { error: dbError } = await _supabase.from('productos').insert([{
-                        nombre: form.nombre,
-                        categoria: form.categoria,
-                        tallas: form.tallas,
-                        precio: parseFloat(form.precio),
-                        tiene_descuento: form.tiene_descuento,
-                        porcentaje_descuento: parseInt(form.porcentaje_descuento),
-                        precio_oferta: precioFinal,
-                        imagen_url: publicUrl,
-                        disponible: true
-                    }]);
-
-                    if (dbError) throw dbError;
-
-                    alert("¡Prenda publicada con éxito!");
-                    // Resetear formulario
-                    setForm({ nombre: '', categoria: 'Bebé', tallas: '', precio: '', tiene_descuento: false, porcentaje_descuento: 0 });
-                    setPreviewUrl(null);
-                    setImageFile(null);
-                } catch (err) {
-                    alert("Error: " + err.message);
-                } finally {
-                    setLoading(false);
-                }
-            };
-
-            if (!isLogged) {
-                return (
-                    <div className="login-card" style={{textAlign: 'center'}}>
-                        <h2 style={{marginBottom: '5px'}}>SUA ADMIN</h2>
-                        <p style={{color: '#64748b', fontSize: '0.9rem', marginBottom: '30px'}}>Panel de Inventario</p>
-                        <input type="password" placeholder="Palabra clave" onChange={(e)=>setPass(e.target.value)} onKeyPress={(e)=>e.key==='Enter' && handleLogin()}/>
-                        <button onClick={handleLogin} disabled={loading} style={{width: '100%', marginTop: '15px'}}>{loading ? 'Entrando...' : 'Acceder'}</button>
-                    </div>
-                );
-            }
-
             return (
-                <div className="admin-container">
-                    <h2 style={{textAlign: 'center', marginBottom: '30px'}}>Publicar Prenda</h2>
-                    <form onSubmit={handleSubmit}>
-                        <div className="form-group">
-                            <label>Nombre del Producto</label>
-                            <input type="text" placeholder="Ej: Conjunto de Algodón" required value={form.nombre} onChange={e => setForm({...form, nombre: e.target.value})} />
-                        </div>
-
-                        <div className="form-group">
-                            <label>Categoría</label>
-                            <div className="radio-group">
-                                {['Bebé', 'Niño', 'Niña'].map(c => (
-                                    <label key={c} className="radio-item">
-                                        <input type="radio" name="cat" checked={form.categoria === c} onChange={() => setForm({...form, categoria: c})} /> 
-                                        {c}
-                                    </label>
-                                ))}
-                            </div>
-                        </div>
-
-                        <div className="form-group">
-                            <label>Tallas Disponibles</label>
-                            <input type="text" placeholder="Ej: 0-3m, 6m, 12m" value={form.tallas} onChange={e => setForm({...form, tallas: e.target.value})} />
-                        </div>
-
-                        <div className="form-group">
-                            <label>Precio Unitario (₡)</label>
-                            <input type="number" placeholder="0.00" required value={form.precio} onChange={e => setForm({...form, precio: e.target.value})} />
-                        </div>
-
-                        <div className="form-group">
-                            <label>¿Tiene descuento?</label>
-                            <select value={form.tiene_descuento} onChange={e => setForm({...form, tiene_descuento: e.target.value === 'true'})}>
-                                <option value="false">Precio Regular</option>
-                                <option value="true">Precio de Oferta</option>
-                            </select>
-                        </div>
-
-                        {form.tiene_descuento && (
-                            <div className="discount-box">
-                                <label>Porcentaje de rebaja (%)</label>
-                                <input type="number" placeholder="Ej: 15" value={form.porcentaje_descuento} onChange={e => setForm({...form, porcentaje_descuento: e.target.value})} />
-                            </div>
-                        )}
-
-                        <div className="form-group">
-                            <label>Imagen de la Prenda</label>
-                            <input type="file" accept="image/*" onChange={handleFileChange} />
-                        </div>
-
-                        {previewUrl && (
-                            <div className="preview-img-container">
-                                <img src={previewUrl} className="preview-img" alt="Vista previa" />
-                            </div>
-                        )}
-
-                        <div className="btn-group">
-                            <button type="button" className="btn-preview" onClick={() => !previewUrl && alert("Primero selecciona una imagen")}>
-                                Vista Previa
-                            </button>
-                            <button type="submit" disabled={loading}>
-                                {loading ? 'Subiendo...' : 'Publicar'}
-                            </button>
-                        </div>
-                    </form>
+                <div className="card" style={{maxWidth: '500px'}}>
+                    <h2 style={{color: 'var(--naranja)'}}>Bienvenido, Ronald</h2>
+                    <p>¿Qué deseas gestionar hoy?</p>
+                    <div className="menu-grid">
+                        <a href="agregar.html" className="menu-opt">
+                            <strong style={{display: 'block', fontSize: '1.2rem'}}>+ Subir Producto</strong>
+                            <small style={{opacity: 0.6}}>Añadir nuevas prendas al catálogo</small>
+                        </a>
+                        <a href="administrar.html" className="menu-opt">
+                            <strong style={{display: 'block', fontSize: '1.2rem'}}>⚙️ Administrar</strong>
+                            <small style={{opacity: 0.6}}>Editar precios, stock y promociones</small>
+                        </a>
+                    </div>
                 </div>
             );
         }
-
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<AdminApp />);
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
     </script>
 </body>
 </html>
