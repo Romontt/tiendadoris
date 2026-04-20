@@ -5,6 +5,7 @@ function App() {
     const [cat, setCat] = useState('Todos');
     const [loading, setLoading] = useState(true);
 
+    // Configuración de Supabase (Tu conexión actual)
     const _supabase = supabase.createClient(
         'https://hvnpkljyoocqdzwdptgt.supabase.co',
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2bnBrbGp5b29jcWR6d2RwdGd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2MTAxMTQsImV4cCI6MjA5MjE4NjExNH0.-pq3iVzqJsJCyGNXkFPlHSIQeBTrr7i7ptsY6FYjJZ0'
@@ -13,31 +14,24 @@ function App() {
     useEffect(() => {
         const loadData = async () => {
             setLoading(true);
-            let q = _supabase.from('productos').select('*').eq('disponible', true);
-            if (cat !== 'Todos') q = q.eq('categoria', cat);
-            const { data } = await q.order('created_at', { ascending: false });
+            let query = _supabase.from('productos').select('*').eq('disponible', true);
+            if (cat !== 'Todos') query = query.eq('categoria', cat);
+            
+            const { data } = await query.order('created_at', { ascending: false });
             setItems(data || []);
             setLoading(false);
         };
         loadData();
     }, [cat]);
 
-    // Textos personalizados para el Hero según la categoría
-    const getHeroText = () => {
-        switch(cat) {
-            case 'Bebé': return "Pequeños Sueños, Grandes Estilos";
-            case 'Niño': return "Aventuras con Estilo Propio";
-            case 'Niña': return "Magia y Color en cada Prenda";
-            case 'Hombre': return "Sofisticación Moderna";
-            case 'Mujer': return "Elegancia Sin Límites";
-            default: return "Moda Exclusiva con Historia";
-        }
-    };
-
     return (
-        <div className={`tema-${cat}`}>
+        <div>
+            {/* Header / Navbar */}
             <nav className="nav-bar">
-                <div className="sua-text">SUA</div>
+                <div className="logo-container">
+                    <span className="sua-text">SUA</span>
+                    <span className="sua-tagline">Pococí • Curaduría</span>
+                </div>
                 <div className="nav-links">
                     {['Todos', 'Bebé', 'Niño', 'Niña', 'Hombre', 'Mujer'].map(c => (
                         <button 
@@ -49,29 +43,53 @@ function App() {
                         </button>
                     ))}
                 </div>
+                <div style={{color: 'var(--azul-noche)', fontSize: '1.2rem'}}>☰</div>
             </nav>
 
+            {/* Hero Section Llamativa */}
             <header className="hero">
-                <div style={{maxWidth: '600px'}}>
-                    <p style={{letterSpacing: '5px', fontSize: '0.7rem'}}>{cat.toUpperCase()}</p>
-                    <h1>{getHeroText()}</h1>
+                <div className="hero-content">
+                    <p style={{letterSpacing: '5px', fontSize: '0.7rem', marginBottom: '15px'}}>GUÁPILES, COSTA RICA</p>
+                    <h1>Moda <i>Exclusiva</i> <br/>con Historia.</h1>
+                    <p style={{opacity: 0.8, marginTop: '20px', maxWidth: '400px'}}>
+                        Curaduría premium de piezas únicas para quienes buscan destacar en cada detalle.
+                    </p>
                 </div>
+                <div className="hero-image"></div>
             </header>
 
-            <main className="grid">
+            {/* Galería de Productos */}
+            <main className="container">
+                <h2 className="section-title">{cat === 'Todos' ? 'Nuestra Selección' : cat}</h2>
+                
                 {loading ? (
-                    <p style={{gridColumn: '1/-1', textAlign: 'center'}}>Actualizando galería...</p>
-                ) : items.map(item => (
-                    <article key={item.id} className="card">
-                        <img src={item.imagen_url} className="card-img" alt={item.nombre} />
-                        <div style={{padding: '10px'}}>
-                            <h3 style={{margin: '10px 0 5px'}}>{item.nombre}</h3>
-                            <span style={{fontWeight: '700', color: 'var(--accent)'}}>₡{item.price?.toLocaleString() || item.precio?.toLocaleString()}</span>
-                            <button className="btn-action">Ver Detalles</button>
-                        </div>
-                    </article>
-                ))}
+                    <div style={{textAlign: 'center', padding: '100px', letterSpacing: '10px'}}>CARGANDO...</div>
+                ) : (
+                    <div className="grid">
+                        {items.length > 0 ? items.map(item => (
+                            <article key={item.id} className="card">
+                                <img src={item.imagen_url} className="card-img" alt={item.nombre} />
+                                <div className="card-info">
+                                    <small style={{opacity: 0.5, textTransform: 'uppercase'}}>{item.categoria}</small>
+                                    <h3>{item.nombre}</h3>
+                                    <span className="card-price">₡{item.precio.toLocaleString()}</span>
+                                    <button className="btn-add">Consultar</button>
+                                </div>
+                            </article>
+                        )) : (
+                            <div style={{gridColumn: '1/-1', textAlign: 'center', padding: '100px'}}>
+                                <p>Próximamente nuevas piezas en esta categoría.</p>
+                            </div>
+                        )}
+                    </div>
+                )}
             </main>
+
+            {/* Footer */}
+            <footer style={{background: 'var(--azul-noche)', color: 'white', padding: '80px 5%', textAlign: 'center'}}>
+                <div className="sua-text" style={{color: 'white', marginBottom: '20px'}}>SUA</div>
+                <p style={{opacity: 0.5, fontSize: '0.8rem'}}>© 2026 SUA BOUTIQUE | POCOCÍ, LIMÓN</p>
+            </footer>
         </div>
     );
 }
