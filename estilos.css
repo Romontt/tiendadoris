@@ -1,28 +1,60 @@
 :root {
-    --crema: #fcfaf7;
-    --shadow: 0 10px 30px rgba(0,0,0,0.05);
-    --transition: all 0.5s ease;
+    --verde-boutique: #0d2c24; /* Verde profundo imperial */
+    --naranja-siena: #d46a4e; /* Naranja tierra tipo Punto 506 */
+    --azul-noche: #0f172a;    /* Azul elegante para acentos */
+    --crema-fondo: #fcfaf7;
+    --blanco: #ffffff;
+    --shadow: 0 10px 30px rgba(0,0,0,0.08);
 }
-
-/* --- TEMAS POR CATEGORÍA --- */
-.tema-Todos { --accent: #d46a4e; --bg-hero: #0d2c24; --text: #0f172a; }
-.tema-Bebé { --accent: #f0b4b4; --bg-hero: #fdf2f2; --text: #7c4a4a; --radius: 50px; }
-.tema-Niño { --accent: #6495ed; --bg-hero: #eef4ff; --text: #2d4263; --radius: 15px; }
-.tema-Niña { --accent: #da70d6; --bg-hero: #fff0f5; --text: #603060; --radius: 30px; }
-.tema-Hombre { --accent: #2c3e50; --bg-hero: #1a252f; --text: #ecf0f1; --radius: 5px; }
-.tema-Mujer { --accent: #c5a059; --bg-hero: #1a1a1a; --text: #ffffff; --radius: 0px; }
 
 body {
-    background-color: var(--crema);
+    background-color: var(--crema-fondo);
     font-family: 'Outfit', sans-serif;
     margin: 0;
-    transition: var(--transition);
+    color: var(--azul-noche);
 }
 
-/* Navbar Adaptable */
+/* --- LOGO SUA --- */
+.logo-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.sua-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.2rem;
+    font-weight: 600;
+    letter-spacing: 12px;
+    color: var(--verde-boutique);
+    position: relative;
+    line-height: 1;
+}
+
+.sua-text::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: 45%;
+    width: 6px;
+    height: 6px;
+    background: var(--naranja-siena);
+    border-radius: 50%;
+    box-shadow: 0 0 8px rgba(212, 106, 78, 0.6);
+}
+
+.sua-tagline {
+    font-size: 0.55rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--naranja-siena);
+    margin-top: 5px;
+}
+
+/* --- NAVEGACIÓN --- */
 .nav-bar {
-    background: white;
-    padding: 15px 5%;
+    background: var(--blanco);
+    padding: 20px 5%;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -32,90 +64,138 @@ body {
     box-shadow: var(--shadow);
 }
 
-.sua-text {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 2.2rem;
-    font-weight: 600;
-    letter-spacing: 12px;
-    color: #0d2c24;
-}
-
-/* --- HERO DINÁMICO --- */
-.hero {
-    margin: 20px 5%;
-    height: 400px;
+.nav-links {
     display: flex;
-    align-items: center;
-    padding: 0 60px;
-    border-radius: var(--radius, 40px);
-    background: var(--bg-hero);
-    color: var(--text);
-    transition: var(--transition);
-    position: relative;
-    overflow: hidden;
+    gap: 25px;
 }
 
-.hero h1 {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 4rem;
-    z-index: 2;
-}
-
-/* --- BOTONES DE CATEGORÍA --- */
-.nav-links { display: flex; gap: 15px; }
 .nav-links button {
-    border: 1px solid #eee;
-    background: white;
-    padding: 10px 20px;
-    border-radius: 30px;
+    background: none;
+    border: none;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
     cursor: pointer;
-    font-weight: 600;
+    color: var(--azul-noche);
     transition: 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .nav-links button.active {
-    background: var(--accent);
-    color: white;
-    border-color: var(--accent);
+    color: var(--naranja-siena);
 }
 
-/* --- CARDS ADAPTABLES --- */
+/* --- HERO SECTION --- */
+.hero {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    background: var(--verde-boutique);
+    margin: 30px 5%;
+    border-radius: 40px;
+    overflow: hidden;
+    height: 500px;
+    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.3);
+}
+
+.hero-content {
+    padding: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    color: var(--crema-fondo);
+}
+
+.hero-content h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 4.5rem;
+    margin: 0;
+    line-height: 0.9;
+}
+
+.hero-content h1 i { font-style: italic; color: var(--naranja-siena); }
+
+.hero-image {
+    background: url('https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?q=80&w=2070') center/cover;
+}
+
+/* --- GRID DE PRODUCTOS --- */
+.container {
+    padding: 40px 5%;
+}
+
+.section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.5rem;
+    margin-bottom: 40px;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.1);
+    padding-bottom: 10px;
+}
+
 .grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 30px;
-    padding: 40px 5%;
 }
 
 .card {
-    background: white;
-    border-radius: var(--radius, 25px);
+    background: var(--blanco);
+    border-radius: 25px;
     padding: 15px;
     box-shadow: var(--shadow);
-    transition: var(--transition);
-    border: 2px solid transparent;
+    transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 1px solid rgba(0,0,0,0.02);
 }
 
 .card:hover {
-    border-color: var(--accent);
     transform: translateY(-10px);
 }
 
 .card-img {
     width: 100%;
-    aspect-ratio: 1/1;
-    border-radius: calc(var(--radius) / 1.5);
+    aspect-ratio: 1/1.2;
+    border-radius: 18px;
     object-fit: cover;
+    background: #f1f5f9;
 }
 
-.btn-action {
-    width: 100%;
-    padding: 12px;
-    border: none;
-    border-radius: var(--radius, 10px);
-    background: var(--accent);
-    color: white;
+.card-info {
+    padding: 15px 5px;
+}
+
+.card-info h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: var(--azul-noche);
+}
+
+.card-price {
+    display: block;
+    margin-top: 10px;
     font-weight: 700;
+    font-size: 1.2rem;
+    color: var(--verde-boutique);
+}
+
+.btn-add {
+    width: 100%;
     margin-top: 15px;
+    padding: 12px;
+    border-radius: 12px;
+    border: none;
+    background: var(--azul-noche);
+    color: white;
+    font-weight: 600;
     cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-add:hover {
+    background: var(--naranja-siena);
+}
+
+@media (max-width: 768px) {
+    .hero { grid-template-columns: 1fr; height: auto; }
+    .hero-content h1 { font-size: 3rem; }
+    .nav-links { display: none; }
 }
