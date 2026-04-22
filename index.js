@@ -71,15 +71,15 @@ function App() {
                 </div>
             </header>
 
-            {/* GRID DE PRODUCTOS AJUSTADO PARA IMÁGENES GRANDES */}
-            <main className="main-content" style={{ padding: '20px 10px' }}>
+            {/* GRID DE PRODUCTOS: 2 COLUMNAS SIEMPRE */}
+            <main className="main-content" style={{ padding: '15px 8px' }}>
                 {loading ? (
                     <div className="loader">Cargando tesoros...</div>
                 ) : (
                     <div className="product-grid" style={{ 
                         display: 'grid', 
-                        gridTemplateColumns: window.innerWidth < 768 ? '1fr' : 'repeat(2, 1fr)', 
-                        gap: '25px',
+                        gridTemplateColumns: 'repeat(2, 1fr)', 
+                        gap: '12px',
                         maxWidth: '1200px',
                         margin: '0 auto'
                     }}>
@@ -88,13 +88,18 @@ function App() {
                                 <div className="image-wrapper" style={{ 
                                     width: '100%', 
                                     aspectRatio: '4 / 5', 
-                                    borderRadius: '24px', 
+                                    borderRadius: '16px', 
                                     overflow: 'hidden',
                                     position: 'relative',
-                                    boxShadow: '0 10px 30px rgba(0,0,0,0.1)'
+                                    boxShadow: '0 4px 15px rgba(0,0,0,0.08)'
                                 }}>
                                     {item.tiene_descuento && (
-                                        <span className="promo-badge" style={{ position: 'absolute', zIndex: 2 }}>-{item.porcentaje_descuento}%</span>
+                                        <span className="promo-badge" style={{ 
+                                            position: 'absolute', 
+                                            zIndex: 2,
+                                            fontSize: '0.7rem',
+                                            padding: '4px 8px'
+                                        }}>-{item.porcentaje_descuento}%</span>
                                     )}
                                     <img 
                                         src={item.imagen_url} 
@@ -104,25 +109,32 @@ function App() {
                                     />
                                 </div>
                                 
-                                <div className="product-info" style={{ padding: '15px 5px' }}>
-                                    <span className="product-cat">{item.categoria}</span>
-                                    <h3 style={{ fontSize: '1.4rem', margin: '8px 0' }}>{item.nombre}</h3>
-                                    <div className="product-price" style={{ marginBottom: '15px' }}>
+                                <div className="product-info" style={{ padding: '10px 2px' }}>
+                                    <span className="product-cat" style={{ fontSize: '0.7rem' }}>{item.categoria}</span>
+                                    <h3 style={{ fontSize: '0.95rem', margin: '4px 0', lineHeight: '1.2' }}>{item.nombre}</h3>
+                                    <div className="product-price" style={{ marginBottom: '10px' }}>
                                         {item.tiene_descuento ? (
                                             <>
-                                                <span className="current-price" style={{ fontSize: '1.3rem', fontWeight: '700' }}>₡{parseInt(item.precio_offer || item.precio_oferta).toLocaleString()}</span>
-                                                <span className="old-price" style={{ marginLeft: '10px', opacity: 0.5, textDecoration: 'line-through' }}>₡{parseInt(item.precio).toLocaleString()}</span>
+                                                <span className="current-price" style={{ fontSize: '1rem', fontWeight: '700' }}>₡{parseInt(item.precio_offer || item.precio_oferta).toLocaleString()}</span>
+                                                <br/>
+                                                <span className="old-price" style={{ fontSize: '0.8rem', opacity: 0.5, textDecoration: 'line-through' }}>₡{parseInt(item.precio).toLocaleString()}</span>
                                             </>
                                         ) : (
-                                            <span className="current-price" style={{ fontSize: '1.3rem', fontWeight: '700' }}>₡{parseInt(item.precio).toLocaleString()}</span>
+                                            <span className="current-price" style={{ fontSize: '1rem', fontWeight: '700' }}>₡{parseInt(item.precio).toLocaleString()}</span>
                                         )}
                                     </div>
                                     <button 
                                         className="wa-button"
                                         onClick={() => window.open(`https://wa.me/50688888888?text=Hola Siwá! Me interesa: ${item.nombre}`)}
-                                        style={{ width: '100%', padding: '15px', borderRadius: '15px', fontWeight: 'bold' }}
+                                        style={{ 
+                                            width: '100%', 
+                                            padding: '8px', 
+                                            borderRadius: '10px', 
+                                            fontSize: '0.8rem',
+                                            fontWeight: '600' 
+                                        }}
                                     >
-                                        Consultar Disponibilidad
+                                        Consultar
                                     </button>
                                 </div>
                             </article>
