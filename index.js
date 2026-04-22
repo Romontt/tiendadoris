@@ -36,29 +36,50 @@ function App() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    // Detectar si es móvil para el grid
     const isMobile = window.innerWidth < 768;
 
     return (
         <div className={`app-container theme-siwa`}>
-            {/* NAVEGACIÓN AJUSTADA */}
-            <nav className="nav-bar" style={{ padding: '10px 20px' }}>
-                <div className="logo-wrapper" style={{ transform: isMobile ? 'scale(1)' : 'scale(0.85)', transformOrigin: 'left' }}>
-                    <div className="siwa-brand">
+            {/* NAVEGACIÓN MEJORADA PARA PC */}
+            <nav className="nav-bar" style={{ 
+                padding: isMobile ? '10px 15px' : '25px 40px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between'
+            }}>
+                <div className="logo-wrapper" style={{ flexShrink: 0 }}>
+                    <div className="siwa-brand" style={{ 
+                        fontSize: isMobile ? '1.5rem' : '2.4rem', 
+                        lineHeight: '1' 
+                    }}>
                         <span className="logo-symbol">@</span>
                         <span className="logo-text">Siwá</span>
                         <span className="logo-dot">.</span>
                     </div>
-                    <small className="logo-tagline">TIENDA VIRTUAL INFANTIL</small>
+                    <small className="logo-tagline" style={{ 
+                        fontSize: isMobile ? '0.6rem' : '0.85rem',
+                        letterSpacing: isMobile ? '1px' : '3px',
+                        display: 'block',
+                        marginTop: '4px'
+                    }}>
+                        TIENDA VIRTUAL INFANTIL
+                    </small>
                 </div>
                 
-                <div className="nav-links" style={{ gap: isMobile ? '10px' : '20px' }}>
+                <div className="nav-links" style={{ 
+                    gap: isMobile ? '8px' : '15px',
+                    display: 'flex'
+                }}>
                     {['Todos', 'Bebé', 'Niño', 'Niña'].map(c => (
                         <button 
                             key={c} 
                             className={cat === c ? 'nav-btn active' : 'nav-btn'} 
                             onClick={() => setCat(c)}
-                            style={{ fontSize: isMobile ? '0.9rem' : '0.85rem', padding: isMobile ? '8px 12px' : '6px 15px' }}
+                            style={{ 
+                                fontSize: isMobile ? '0.85rem' : '1rem', 
+                                padding: isMobile ? '8px 12px' : '10px 20px',
+                                borderRadius: '12px'
+                            }}
                         >
                             {c}
                         </button>
@@ -75,7 +96,7 @@ function App() {
                 </div>
             </header>
 
-            {/* GRID DE PRODUCTOS: 2 EN MÓVIL, 4 EN PC */}
+            {/* GRID DE PRODUCTOS */}
             <main className="main-content" style={{ padding: isMobile ? '15px 8px' : '40px 20px' }}>
                 {loading ? (
                     <div className="loader">Cargando tesoros...</div>
@@ -84,7 +105,7 @@ function App() {
                         display: 'grid', 
                         gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', 
                         gap: isMobile ? '12px' : '30px',
-                        maxWidth: '1200px',
+                        maxWidth: '1300px',
                         margin: '0 auto'
                     }}>
                         {items.map(item => (
