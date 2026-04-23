@@ -293,25 +293,36 @@ function App() {
                     style={{
                         position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
                         background: 'rgba(0,0,0,0.95)', zIndex: 3000, display: 'flex', 
-                        alignItems: 'center', justifyContent: 'center', padding: '15px',
+                        alignItems: 'center', justifyContent: 'center',
                         cursor: 'zoom-out'
                     }}
                 >
                     <button 
-                        onClick={() => setSelectedImage(null)}
-                        style={{ position: 'absolute', top: '20px', right: '20px', background: 'white', border: 'none', borderRadius: '50%', width: '40px', height: '40px', fontSize: '1.2rem', cursor: 'pointer', zIndex: 3001, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                    >✕</button>
-                    <img 
-                        src={selectedImage} 
+                        onClick={(e) => { e.stopPropagation(); setSelectedImage(null); }}
                         style={{ 
-                            maxWidth: '100%', 
-                            maxHeight: '100%', 
-                            objectFit: 'contain', 
-                            borderRadius: '8px', 
-                            boxShadow: '0 0 30px rgba(0,0,0,0.5)' 
-                        }} 
-                        alt="Vista ampliada"
-                    />
+                            position: 'absolute', top: '25px', right: '25px', 
+                            background: 'white', border: 'none', borderRadius: '50%', 
+                            width: '44px', height: '44px', fontSize: '1.4rem', 
+                            cursor: 'pointer', zIndex: 3001, display: 'flex', 
+                            alignItems: 'center', justifyContent: 'center',
+                            boxShadow: '0 2px 10px rgba(0,0,0,0.3)',
+                            color: '#333'
+                        }}
+                    >✕</button>
+                    
+                    <div style={{ position: 'relative', width: '90%', height: '90%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <img 
+                            src={selectedImage} 
+                            style={{ 
+                                maxWidth: '100%', 
+                                maxHeight: '100%', 
+                                objectFit: 'contain', 
+                                borderRadius: '4px'
+                            }} 
+                            alt="Vista ampliada"
+                            onClick={(e) => e.stopPropagation()}
+                        />
+                    </div>
                 </div>
             )}
 
