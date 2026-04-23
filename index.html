@@ -20,10 +20,20 @@
 <body>
 
     <div id="root">
-        <div style="height: 100vh; display: flex; justify-content: center; align-items: center; background: #0a1f1a;">
-            <p style="color: #d46a4e; font-family: 'Outfit', sans-serif; letter-spacing: 2px;">CARGANDO SIWÁ...</p>
+        <div style="height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; background: #0a1f1a;">
+            <p style="color: #d46a4e; font-family: 'Outfit', sans-serif; letter-spacing: 2px; margin-bottom: 10px;">CARGANDO SIWÁ...</p>
+            <div style="width: 40px; height: 2px; background: rgba(212, 106, 78, 0.3); position: relative; overflow: hidden;">
+                <div style="position: absolute; width: 20px; height: 100%; background: #d46a4e; animation: load 1.5s infinite ease-in-out;"></div>
+            </div>
         </div>
     </div>
+
+    <style>
+        @keyframes load {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+    </style>
 
     <script type="text/babel" src="index.js"></script>
 
