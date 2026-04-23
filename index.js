@@ -14,7 +14,7 @@ function App() {
 
     const _supabase = supabase.createClient(
         'https://hvnpkljyoocqdzwdptgt.supabase.co',
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2bnBrbGp5b29jcWR6d2RwdGd0Iiwicm9sZSI6Imh2bnBrbGp5b29jcWR6d2RwdGd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2MTAxMTQsImV4cCI6MjA5MjE4NjExNH0.-pq3iVzqJsJCyGNXkFPlHSIQeBTrr7i7ptsY6FYjJZ0'
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2bnBrbGp5b29jcWR6d2RwdGd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2MTAxMTQsImV4cCI6MjA5MjE4NjExNH0.-pq3iVzqJsJCyGNXkFPlHSIQeBTrr7i7ptsY6FYjJZ0'
     );
 
     useEffect(() => {
@@ -99,20 +99,20 @@ function App() {
             }}>
                 <div className="logo-wrapper" style={{ flexShrink: 0 }}>
                     <div className="siwa-brand" style={{ 
-                        fontSize: isMobile ? '1.8rem' : '3.2rem', 
+                        fontSize: isMobile ? '2rem' : '3.2rem', // Aumentado
                         lineHeight: '1',
-                        fontWeight: '800' // Letras mucho más gruesas
+                        fontWeight: '900' // Grosor máximo para el nombre
                     }}>
-                        <span className="logo-symbol">@</span>
+                        <span className="logo-symbol" style={{ fontWeight: '800' }}>@</span>
                         <span className="logo-text">Siwá</span>
                         <span className="logo-dot">.</span>
                     </div>
                     <small className="logo-tagline" style={{ 
-                        fontSize: isMobile ? '0.75rem' : '1rem', // Más grande
-                        letterSpacing: isMobile ? '1.5px' : '4px',
+                        fontSize: isMobile ? '0.75rem' : '1.1rem', // Aumentado
+                        letterSpacing: isMobile ? '2px' : '4px',
                         display: 'block',
-                        marginTop: '4px',
-                        fontWeight: '700', // Más grueso
+                        marginTop: '6px',
+                        fontWeight: '800', // Más negrita
                         textTransform: 'uppercase'
                     }}>
                         TIENDA VIRTUAL INFANTIL
@@ -232,7 +232,7 @@ function App() {
                                             fontSize: isMobile ? '0.9rem' : '1.1rem', 
                                             margin: '4px 0', 
                                             lineHeight: '1.2',
-                                            minHeight: isMobile ? '2.2rem' : '2.6rem', 
+                                            minHeight: isMobile ? '2.2rem' : '2.6rem',
                                             display: '-webkit-box',
                                             WebkitLineClamp: 2,
                                             WebkitBoxOrient: 'vertical',
@@ -280,7 +280,6 @@ function App() {
                 )}
             </main>
 
-            {/* --- INTERFAZ DE CARRITO (OVERLAY) --- */}
             {isCartOpen && (
                 <div style={{
                     position: 'fixed', top: 0, right: 0, bottom: 0, width: isMobile ? '100%' : '400px',
@@ -329,7 +328,6 @@ function App() {
                 </div>
             )}
 
-            {/* --- MODAL DE INFORMACIÓN (ENVÍOS / TÉRMINOS) --- */}
             {helpModal.open && (
                 <div style={{
                     position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
@@ -362,7 +360,7 @@ function App() {
             <footer className="main-footer">
                 <div className="footer-top">
                     <div className="footer-column brand-col">
-                        <div className="siwa-logo-footer">Siwá</div>
+                        <div className="siwa-logo-footer" style={{ fontWeight: '900', fontSize: '2rem' }}>Siwá</div>
                         <p>Moda infantil con propósito y raíz.</p>
                     </div>
                     <div className="footer-column">
