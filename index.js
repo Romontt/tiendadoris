@@ -328,7 +328,8 @@ function App() {
                     <div className="about-text">
                         <h2>Nuestra Historia</h2>
                         <p>
-                            En la lengua ancestral <strong>Bribri</strong>, <strong>Siwá</strong> es el viento... Enviamos a todo el país desde Guápiles.
+                            En la lengua ancestral <strong>Bribri</strong>, <strong>Siwá</strong> es el viento, el soplo de vida y las historias que viajan con él. 
+                            Nuestra tienda virtual en Guápiles nace para ser ese viento fresco que trae lo mejor del mundo para vestir los momentos más importantes de tus hijos.
                         </p>
                     </div>
                 </div>
