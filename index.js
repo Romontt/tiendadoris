@@ -20,6 +20,33 @@ function App() {
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2bnBrbGp5b29jcWR6d2RwdGd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2MTAxMTQsImV4cCI6MjA5MjE4NjExNH0.-pq3iVzqJsJCyGNXkFPlHSIQeBTrr7i7ptsY6FYjJZ0'
     );
 
+    // --- LÓGICA DE RASTREO (Punto 506 / SIWÁ) ---
+    const sessionId = (() => {
+        let id = sessionStorage.getItem('siwa_session');
+        if (!id) {
+            id = crypto.randomUUID();
+            sessionStorage.setItem('siwa_session', id);
+        }
+        return id;
+    })();
+
+    const trackEvent = async (table, data) => {
+        try {
+            await _supabase.from(table).insert([{ ...data, session_id: sessionId }]);
+        } catch (e) {
+            console.error("Tracking error:", e);
+        }
+    };
+
+    // Rastrear vista de página al cambiar categoría
+    useEffect(() => {
+        trackEvent('page_views', {
+            page_path: cat === 'Todos' ? '/' : `/${cat}`,
+            user_agent: navigator.userAgent,
+            referrer: document.referrer
+        });
+    }, [cat]);
+
     useEffect(() => {
         const loadData = async () => {
             setLoading(true);
@@ -46,11 +73,23 @@ function App() {
         const exists = cart.find(item => item.id === product.id);
         if (!exists) {
             setCart([...cart, { ...product, cartId: Date.now() + Math.random() }]);
+            // Rastrear clic en añadir
+            trackEvent('user_clicks', {
+                element_id: 'btn-add-to-cart',
+                click_text: `Añadir: ${product.nombre}`,
+                page_path: window.location.pathname
+            });
         }
     };
 
     const removeFromCart = (cartId) => {
+        const item = cart.find(i => i.cartId === cartId);
         setCart(cart.filter(item => item.cartId !== cartId));
+        trackEvent('user_clicks', {
+            element_id: 'btn-remove-cart',
+            click_text: `Remover: ${item?.nombre}`,
+            page_path: window.location.pathname
+        });
     };
 
     const cartTotal = cart.reduce((acc, item) => {
@@ -59,6 +98,12 @@ function App() {
     }, 0);
 
     const enviarPedidoWhatsApp = () => {
+        trackEvent('user_clicks', {
+            element_id: 'btn-confirm-whatsapp',
+            click_text: 'Confirmar Pedido WhatsApp',
+            page_path: window.location.pathname
+        });
+
         const mensajeBase = `¡Hola Siwá! 🌬️ Me interesa realizar el siguiente pedido:%0A%0A`;
         const lista = cart.map(i => `- ${i.nombre} (₡${parseInt(i.tiene_descuento ? (i.precio_offer || i.precio_oferta) : i.precio).toLocaleString()})`).join('%0A');
         const totalTexto = `%0A%0A*Total: ₡${cartTotal.toLocaleString()}*%0A_Envío gratis en Guápiles Centro_`;
@@ -83,13 +128,17 @@ function App() {
                 content: 'Todas nuestras prendas son revisadas cuidadosamente antes del envío para garantizar su calidad. Al ser piezas de talla única, no se realizan cambios ni devoluciones. Una vez confirmada la compra, el artículo se reserva exclusivamente para usted.'
             }
         };
+        trackEvent('user_clicks', {
+            element_id: `help-${type}`,
+            click_text: `Abrir ayuda: ${type}`,
+            page_path: window.location.pathname
+        });
         setHelpModal({ open: true, ...info[type] });
     };
 
     const isMobile = window.innerWidth < 768;
 
     return (
-        /* Se añade la clase dinámica tema-${cat} para conectar con el CSS de colores pasteles */
         <div className={`app-container tema-${cat}`} style={{ boxSizing: 'border-box' }}>
             {/* NAVEGACIÓN */}
             <nav className="nav-bar" style={{ 
@@ -200,7 +249,14 @@ function App() {
                             return (
                                 <article key={item.id} className="product-card" style={{ display: 'flex', flexDirection: 'column' }}>
                                     <div className="image-wrapper" 
-                                        onClick={() => setSelectedImage(item.imagen_url)}
+                                        onClick={() => {
+                                            setSelectedImage(item.imagen_url);
+                                            trackEvent('user_clicks', {
+                                                element_id: 'product-zoom',
+                                                click_text: `Zoom: ${item.nombre}`,
+                                                page_path: window.location.pathname
+                                            });
+                                        }}
                                         style={{ 
                                             width: '100%', 
                                             aspectRatio: '4 / 5', 
