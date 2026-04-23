@@ -9,6 +9,9 @@ function App() {
     const [cart, setCart] = useState([]);
     const [isCartOpen, setIsCartOpen] = useState(false);
 
+    // --- ESTADO DE MODALES DE AYUDA ---
+    const [helpModal, setHelpModal] = useState({ open: false, title: '', content: '' });
+
     const _supabase = supabase.createClient(
         'https://hvnpkljyoocqdzwdptgt.supabase.co',
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2bnBrbGp5b29jcWR6d2RwdGd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2MTAxMTQsImV4cCI6MjA5MjE4NjExNH0.-pq3iVzqJsJCyGNXkFPlHSIQeBTrr7i7ptsY6FYjJZ0'
@@ -37,7 +40,6 @@ function App() {
 
     // --- LÓGICA DE FUNCIONES DEL CARRITO ---
     const addToCart = (product) => {
-        // VALIDACIÓN DE PRENDA ÚNICA: Solo permite agregar si no existe ya en el carrito
         const exists = cart.find(item => item.id === product.id);
         if (!exists) {
             setCart([...cart, { ...product, cartId: Date.now() + Math.random() }]);
@@ -64,6 +66,21 @@ function App() {
     const navTo = (nuevaCat) => {
         setCat(nuevaCat);
         window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    // --- LÓGICA MODALES DE AYUDA ---
+    const openHelp = (type) => {
+        const info = {
+            envios: {
+                title: 'Políticas de Envío 🚚',
+                content: 'Realizamos envíos a todo el país vía Correos de Costa Rica. En Guápiles Centro el envío es gratuito. Para el resto del país, el costo se calcula según la zona.'
+            },
+            terminos: {
+                title: 'Términos y Condiciones 📄',
+                content: 'Todas nuestras prendas son revisadas antes del envío. No se aceptan devoluciones en prendas de oferta. Los cambios por talla están sujetos a disponibilidad de stock.'
+            }
+        };
+        setHelpModal({ open: true, ...info[type] });
     };
 
     const isMobile = window.innerWidth < 768;
@@ -172,9 +189,7 @@ function App() {
                         margin: '0 auto'
                     }}>
                         {items.map(item => {
-                            // Verificamos si este item ya está en el carrito
                             const alreadyInCart = cart.some(c => c.id === item.id);
-                            
                             return (
                                 <article key={item.id} className="product-card" style={{ background: 'transparent' }}>
                                     <div className="image-wrapper" style={{ 
@@ -290,6 +305,21 @@ function App() {
                 </div>
             )}
 
+            {/* --- MODAL DE INFORMACIÓN (ENVÍOS / TÉRMINOS) --- */}
+            {helpModal.open && (
+                <div style={{
+                    position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
+                    background: 'rgba(0,0,0,0.5)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px'
+                }}>
+                    <div style={{ background: 'white', padding: '30px', borderRadius: '20px', maxWidth: '500px', width: '100%', position: 'relative' }}>
+                        <button onClick={() => setHelpModal({ ...helpModal, open: false })} style={{ position: 'absolute', top: '15px', right: '15px', background: 'none', border: 'none', fontSize: '1.2rem', cursor: 'pointer' }}>✕</button>
+                        <h2 style={{ marginTop: 0, color: '#E8AAB8' }}>{helpModal.title}</h2>
+                        <p style={{ lineHeight: '1.6', color: '#666' }}>{helpModal.content}</p>
+                        <button onClick={() => setHelpModal({ ...helpModal, open: false })} style={{ width: '100%', padding: '12px', borderRadius: '12px', background: '#333', color: 'white', border: 'none', marginTop: '20px', cursor: 'pointer' }}>Entendido</button>
+                    </div>
+                </div>
+            )}
+
             <section className="about-section">
                 <div className="about-container">
                     <div className="about-visual">
@@ -298,8 +328,7 @@ function App() {
                     <div className="about-text">
                         <h2>Nuestra Historia</h2>
                         <p>
-                            En la lengua ancestral <strong>Bribri</strong>, <strong>Siwá</strong> es el viento, el soplo de vida y las historias que viajan con él. 
-                            Nuestra tienda en Guápiles nace para ser ese viento fresco que trae lo mejor del mundo para vestir los momentos más importantes de tus hijos.
+                            En la lengua ancestral <strong>Bribri</strong>, <strong>Siwá</strong> es el viento... Enviamos a todo el país desde Guápiles.
                         </p>
                     </div>
                 </div>
@@ -316,18 +345,11 @@ function App() {
                         <ul>{['Bebé', 'Niño', 'Niña'].map(c => <li key={c} onClick={() => navTo(c)} style={{ cursor: 'pointer' }}>{c}</li>)}</ul>
                     </div>
                     <div className="footer-column">
-                        <h4>Envíos</h4>
-                        <p style={{ fontSize: '0.85rem', lineHeight: '1.5' }}>
-                            • <strong>Guápiles Centro:</strong> Envío totalmente gratis.<br/>
-                            • <strong>Fuera de Guápiles:</strong> El costo se validará al momento de procesar tu pedido.
-                        </p>
-                    </div>
-                    <div className="footer-column">
-                        <h4>Términos</h4>
-                        <ul style={{ fontSize: '0.8rem', opacity: 0.8 }}>
-                            <li>• Cambios por defectos en 48h.</li>
-                            <li>• Apartados válidos por 15 días.</li>
-                            <li>• Ofertas no aplican para cambios.</li>
+                        <h4>Ayuda</h4>
+                        <ul>
+                            <li>Guía de Tallas</li>
+                            <li onClick={() => openHelp('envios')} style={{ cursor: 'pointer' }}>Envíos</li>
+                            <li onClick={() => openHelp('terminos')} style={{ cursor: 'pointer' }}>Términos</li>
                         </ul>
                     </div>
                     <div className="footer-column">
