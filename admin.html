@@ -4,20 +4,115 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin | Siwa Boutique</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root { --v-fondo: #0a1f1a; --v-card: #0d2c24; --naranja: #d46a4e; }
-        body { font-family: 'Outfit', sans-serif; background: var(--v-fondo); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; color: #f1f5f9; }
-        .card { background: var(--v-card); width: 90%; max-width: 400px; padding: 40px; border-radius: 30px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); text-align: center; }
-        input { width: 100%; padding: 14px; margin: 15px 0; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: #163d33; color: white; box-sizing: border-box; }
-        button { width: 100%; padding: 16px; border-radius: 15px; border: none; background: var(--naranja); color: white; font-weight: 700; cursor: pointer; transition: 0.3s; margin-top: 10px; }
-        .menu-grid { display: grid; gap: 20px; margin-top: 30px; }
-        .menu-opt { background: #163d33; padding: 25px; border-radius: 20px; text-decoration: none; color: white; border: 1px solid rgba(255,255,255,0.05); transition: 0.3s; }
-        .menu-opt:hover { border-color: var(--naranja); background: #1c4d41; }
+        :root { 
+            --bg: #fdfaf7; 
+            --card-bg: #ffffff; 
+            --accent: #d4a373; /* Dorado suave / Terracota */
+            --text: #4a3f35;
+            --text-light: #8e8276;
+            --danger: #e63946;
+        }
+        
+        body { 
+            font-family: 'Outfit', sans-serif; 
+            background: var(--bg); 
+            margin: 0; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            color: var(--text); 
+        }
+
+        .card { 
+            background: var(--card-bg); 
+            width: 90%; 
+            max-width: 450px; 
+            padding: 40px; 
+            border-radius: 40px; 
+            box-shadow: 0 15px 35px rgba(212, 163, 115, 0.15); 
+            text-align: center; 
+            border: 1px solid rgba(212, 163, 115, 0.1);
+        }
+
+        h2 { font-family: 'Playfair Display', serif; font-size: 2rem; margin-bottom: 10px; color: var(--accent); }
+        p { color: var(--text-light); margin-bottom: 30px; }
+
+        input { 
+            width: 100%; 
+            padding: 16px; 
+            margin: 15px 0; 
+            border-radius: 15px; 
+            border: 1px solid #e9e2db; 
+            background: #fff; 
+            color: var(--text); 
+            box-sizing: border-box; 
+            font-size: 1rem;
+            outline: none;
+            transition: 0.3s;
+        }
+        input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(212, 163, 115, 0.1); }
+
+        button.primary { 
+            width: 100%; 
+            padding: 16px; 
+            border-radius: 15px; 
+            border: none; 
+            background: var(--accent); 
+            color: white; 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: 0.3s; 
+            font-size: 1rem;
+        }
+        button.primary:hover { opacity: 0.9; transform: translateY(-2px); }
+
+        .menu-grid { display: grid; gap: 15px; margin-top: 10px; }
+        
+        .menu-opt { 
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: #fff; 
+            padding: 20px; 
+            border-radius: 20px; 
+            text-decoration: none; 
+            color: var(--text); 
+            border: 1px solid #eeeae5; 
+            transition: 0.3s; 
+            text-align: left;
+        }
+        .menu-opt:hover { 
+            border-color: var(--accent); 
+            background: #fffaf5;
+            transform: scale(1.02);
+        }
+        .icon-box {
+            font-size: 1.5rem;
+            background: #fdf1e8;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+        }
+
+        .logout-btn { 
+            background: transparent; 
+            border: none; 
+            color: var(--text-light); 
+            font-size: 0.9rem; 
+            margin-top: 25px; 
+            cursor: pointer;
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -27,33 +122,8 @@
         const _supabase = supabase.createClient('https://hvnpkljyoocqdzwdptgt.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2bnBrbGp5b29jcWR6d2RwdGd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2MTAxMTQsImV4cCI6MjA5MjE4NjExNH0.-pq3iVzqJsJCyGNXkFPlHSIQeBTrr7i7ptsY6FYjJZ0');
 
         function App() {
-            // Revisa si ya hay una sesión activa guardada
             const [isLogged, setIsLogged] = useState(sessionStorage.getItem('admin_logged') === 'true');
             const [pass, setPass] = useState('');
-
-            // Control de inactividad (15 minutos)
-            useEffect(() => {
-                if (!isLogged) return;
-
-                let timeout;
-                const resetTimer = () => {
-                    clearTimeout(timeout);
-                    timeout = setTimeout(() => {
-                        logout();
-                    }, 15 * 60 * 1000); // 15 minutos
-                };
-
-                // Escuchar movimientos del mouse o teclas
-                window.onload = resetTimer;
-                window.onmousemove = resetTimer;
-                window.onmousedown = resetTimer;
-                window.ontouchstart = resetTimer;
-                window.onclick = resetTimer;
-                window.onkeydown = resetTimer;
-
-                resetTimer();
-                return () => clearTimeout(timeout);
-            }, [isLogged]);
 
             const login = async () => {
                 const { data } = await _supabase.from('configuracion').select('valor').eq('clave', 'admin_token').single();
@@ -61,7 +131,7 @@
                     setIsLogged(true);
                     sessionStorage.setItem('admin_logged', 'true');
                 } else {
-                    alert("Acceso denegado");
+                    alert("Contraseña incorrecta");
                 }
             };
 
@@ -72,27 +142,50 @@
 
             if (!isLogged) return (
                 <div className="card">
-                    <h2>SIWA ADMIN</h2>
-                    <input type="password" placeholder="Palabra clave" onChange={e => setPass(e.target.value)} onKeyPress={e => e.key === 'Enter' && login()}/>
-                    <button onClick={login}>Entrar al Panel</button>
+                    <h2>Siwa Boutique</h2>
+                    <p>Panel de Administración</p>
+                    <input 
+                        type="password" 
+                        placeholder="Introduce la palabra clave" 
+                        onChange={e => setPass(e.target.value)} 
+                        onKeyPress={e => e.key === 'Enter' && login()}
+                    />
+                    <button className="primary" onClick={login}>Iniciar Sesión</button>
                 </div>
             );
 
             return (
-                <div className="card" style={{maxWidth: '500px'}}>
-                    <h2 style={{color: 'var(--naranja)'}}>Bienvenido, Ronald</h2>
-                    <p>¿Qué deseas gestionar hoy?</p>
+                <div className="card">
+                    <h2>Hola, Doris</h2>
+                    <p>¿Qué haremos en la tienda hoy?</p>
+                    
                     <div className="menu-grid">
                         <a href="agregar.html" className="menu-opt">
-                            <strong style={{display: 'block', fontSize: '1.2rem'}}>+ Subir Producto</strong>
-                            <small style={{opacity: 0.6}}>Añadir nuevas prendas al catálogo</small>
+                            <div className="icon-box">✨</div>
+                            <div>
+                                <strong style={{display: 'block'}}>Nuevo Producto</strong>
+                                <small style={{color: 'var(--text-light)'}}>Subir fotos y precios</small>
+                            </div>
                         </a>
+
                         <a href="administrar.html" className="menu-opt">
-                            <strong style={{display: 'block', fontSize: '1.2rem'}}>⚙️ Administrar</strong>
-                            <small style={{opacity: 0.6}}>Editar precios, stock y promociones</small>
+                            <div className="icon-box">🏷️</div>
+                            <div>
+                                <strong style={{display: 'block'}}>Inventario</strong>
+                                <small style={{color: 'var(--text-light)'}}>Cambiar tallas y stock</small>
+                            </div>
                         </a>
-                        <button onClick={logout} style={{background: 'transparent', border: '1px solid rgba(255,255,255,0.2)', fontSize: '0.8rem', padding: '10px'}}>Cerrar Sesión</button>
+
+                        <a href="ventas.html" className="menu-opt">
+                            <div className="icon-box">💰</div>
+                            <div>
+                                <strong style={{display: 'block'}}>Ventas y Ganancias</strong>
+                                <small style={{color: 'var(--text-light)'}}>Confirmar pedidos de WhatsApp</small>
+                            </div>
+                        </a>
                     </div>
+
+                    <button onClick={logout} className="logout-btn">Cerrar sesión de forma segura</button>
                 </div>
             );
         }
