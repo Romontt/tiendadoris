@@ -4,6 +4,10 @@ function App() {
     const [items, setItems] = useState([]);
     const [cat, setCat] = useState('Todos');
     const [loading, setLoading] = useState(true);
+    
+    // --- NUEVO: ESTADO DEL CARRITO ---
+    const [cart, setCart] = useState([]);
+    const [isCartOpen, setIsCartOpen] = useState(false);
 
     const _supabase = supabase.createClient(
         'https://hvnpkljyoocqdzwdptgt.supabase.co',
@@ -31,6 +35,30 @@ function App() {
         loadData();
     }, [cat]);
 
+    // --- NUEVA: LÓGICA DE FUNCIONES DEL CARRITO ---
+    const addToCart = (product) => {
+        // Usamos cartId para poder borrar items individuales aunque sean el mismo producto
+        setCart([...cart, { ...product, cartId: Date.now() + Math.random() }]);
+        if(!isMobile) setIsCartOpen(true); // Abrir carrito automáticamente en PC
+    };
+
+    const removeFromCart = (cartId) => {
+        setCart(cart.filter(item => item.cartId !== cartId));
+    };
+
+    const cartTotal = cart.reduce((acc, item) => {
+        const precio = item.tiene_descuento ? (item.precio_offer || item.precio_oferta) : item.precio;
+        return acc + parseInt(precio);
+    }, 0);
+
+    const enviarPedidoWhatsApp = () => {
+        const mensajeBase = `¡Hola Siwá! 🌬️ Me interesa realizar el siguiente pedido:%0A%0A`;
+        const lista = cart.map(i => `- ${i.nombre} (₡${parseInt(i.tiene_descuento ? (i.precio_offer || i.precio_oferta) : i.precio).toLocaleString()})`).join('%0A');
+        const totalTexto = `%0A%0A*Total: ₡${cartTotal.toLocaleString()}*%0A_Envío gratis en Guápiles Centro_`;
+        
+        window.open(`https://wa.me/50683337497?text=${mensajeBase}${lista}${totalTexto}`);
+    };
+
     const navTo = (nuevaCat) => {
         setCat(nuevaCat);
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -40,12 +68,13 @@ function App() {
 
     return (
         <div className={`app-container theme-siwa`}>
-            {/* NAVEGACIÓN MEJORADA PARA PC */}
+            {/* NAVEGACIÓN */}
             <nav className="nav-bar" style={{ 
                 padding: isMobile ? '10px 15px' : '25px 40px',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'space-between'
+                justifyContent: 'space-between',
+                position: 'sticky', top: 0, zIndex: 100, background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(10px)'
             }}>
                 <div className="logo-wrapper" style={{ flexShrink: 0 }}>
                     <div className="siwa-brand" style={{ 
@@ -68,7 +97,8 @@ function App() {
                 
                 <div className="nav-links" style={{ 
                     gap: isMobile ? '8px' : '15px',
-                    display: 'flex'
+                    display: 'flex',
+                    alignItems: 'center'
                 }}>
                     {['Todos', 'Bebé', 'Niño', 'Niña'].map(c => (
                         <button 
@@ -76,14 +106,27 @@ function App() {
                             className={cat === c ? 'nav-btn active' : 'nav-btn'} 
                             onClick={() => setCat(c)}
                             style={{ 
-                                fontSize: isMobile ? '0.85rem' : '1rem', 
-                                padding: isMobile ? '8px 12px' : '10px 20px',
+                                fontSize: isMobile ? '0.75rem' : '1rem', 
+                                padding: isMobile ? '6px 10px' : '10px 20px',
                                 borderRadius: '12px'
                             }}
                         >
                             {c}
                         </button>
                     ))}
+                    
+                    {/* BOTÓN CARRITO EN NAV */}
+                    <button onClick={() => setIsCartOpen(!isCartOpen)} style={{
+                        background: '#f8f8f8', border: 'none', padding: '10px', borderRadius: '50%',
+                        position: 'relative', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center'
+                    }}>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                        {cart.length > 0 && (
+                            <span style={{ position: 'absolute', top: '-5px', right: '-5px', background: 'var(--accent-color, #E8AAB8)', color: 'white', borderRadius: '50%', width: '18px', height: '18px', fontSize: '0.7rem', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
+                                {cart.length}
+                            </span>
+                        )}
+                    </button>
                 </div>
             </nav>
 
@@ -92,12 +135,12 @@ function App() {
                 <div className="hero-content">
                     <span className="hero-label">Colección 2026</span>
                     <h1>{cat === 'Todos' ? 'Historias que se visten' : `Especial ${cat}`}</h1>
-                    <p>Prendas elegidas con amor para acompañar cada pequeño gran paso y las historias que están por vivir.</p>
+                    <p>Prendas elegidas con amor para acompañar cada pequeño gran paso.</p>
                 </div>
             </header>
 
             {/* GRID DE PRODUCTOS */}
-            <main className="main-content" style={{ padding: isMobile ? '15px 8px' : '40px 20px' }}>
+            <main className="main-content" style={{ padding: isMobile ? '15px 8px' : '40px 20px', paddingBottom: '100px' }}>
                 {loading ? (
                     <div className="loader">Cargando tesoros...</div>
                 ) : (
@@ -123,7 +166,8 @@ function App() {
                                             position: 'absolute', 
                                             zIndex: 2,
                                             fontSize: '0.7rem',
-                                            padding: '4px 8px'
+                                            padding: '4px 8px',
+                                            background: '#E8AAB8', color: 'white', left: '10px', top: '10px', borderRadius: '8px'
                                         }}>-{item.porcentaje_descuento}%</span>
                                     )}
                                     <img 
@@ -135,14 +179,13 @@ function App() {
                                 </div>
                                 
                                 <div className="product-info" style={{ padding: '10px 2px' }}>
-                                    <span className="product-cat" style={{ fontSize: '0.7rem' }}>{item.categoria}</span>
-                                    <h3 style={{ fontSize: isMobile ? '0.95rem' : '1.1rem', margin: '4px 0', lineHeight: '1.2' }}>{item.nombre}</h3>
+                                    <span className="product-cat" style={{ fontSize: '0.7rem', opacity: 0.6 }}>{item.categoria}</span>
+                                    <h3 style={{ fontSize: isMobile ? '0.9rem' : '1.1rem', margin: '4px 0', lineHeight: '1.2' }}>{item.nombre}</h3>
                                     <div className="product-price" style={{ marginBottom: '10px' }}>
                                         {item.tiene_descuento ? (
                                             <>
                                                 <span className="current-price" style={{ fontSize: '1rem', fontWeight: '700' }}>₡{parseInt(item.precio_offer || item.precio_oferta).toLocaleString()}</span>
-                                                <br/>
-                                                <span className="old-price" style={{ fontSize: '0.8rem', opacity: 0.5, textDecoration: 'line-through' }}>₡{parseInt(item.precio).toLocaleString()}</span>
+                                                <span className="old-price" style={{ fontSize: '0.8rem', opacity: 0.5, textDecoration: 'line-through', marginLeft: '8px' }}>₡{parseInt(item.precio).toLocaleString()}</span>
                                             </>
                                         ) : (
                                             <span className="current-price" style={{ fontSize: '1rem', fontWeight: '700' }}>₡{parseInt(item.precio).toLocaleString()}</span>
@@ -150,16 +193,17 @@ function App() {
                                     </div>
                                     <button 
                                         className="wa-button"
-                                        onClick={() => window.open(`https://wa.me/50683337497?text=Hola Siwá! Me interesa: ${item.nombre}`)}
+                                        onClick={() => addToCart(item)}
                                         style={{ 
                                             width: '100%', 
-                                            padding: '8px', 
-                                            borderRadius: '10px', 
+                                            padding: '10px', 
+                                            borderRadius: '12px', 
                                             fontSize: '0.8rem',
-                                            fontWeight: '600' 
+                                            fontWeight: '600',
+                                            background: '#25D366', color: 'white', border: 'none', cursor: 'pointer'
                                         }}
                                     >
-                                        Consultar
+                                        Añadir al carrito
                                     </button>
                                 </div>
                             </article>
@@ -167,6 +211,55 @@ function App() {
                     </div>
                 )}
             </main>
+
+            {/* --- NUEVA INTERFAZ DE CARRITO (OVERLAY) --- */}
+            {isCartOpen && (
+                <div style={{
+                    position: 'fixed', top: 0, right: 0, bottom: 0, width: isMobile ? '100%' : '400px',
+                    background: 'white', zIndex: 1000, boxShadow: '-5px 0 30px rgba(0,0,0,0.1)',
+                    display: 'flex', flexDirection: 'column', animation: 'slideIn 0.3s ease'
+                }}>
+                    <div style={{ padding: '20px', borderBottom: '1px solid #eee', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <h2 style={{ fontSize: '1.2rem', margin: 0 }}>Tu Carrito 🛒</h2>
+                        <button onClick={() => setIsCartOpen(false)} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer' }}>✕</button>
+                    </div>
+                    
+                    <div style={{ flex: 1, overflowY: 'auto', padding: '20px' }}>
+                        {cart.length === 0 ? (
+                            <p style={{ textAlign: 'center', color: '#999', marginTop: '40px' }}>El carrito está vacío</p>
+                        ) : (
+                            cart.map(item => (
+                                <div key={item.cartId} style={{ display: 'flex', gap: '15px', marginBottom: '15px', alignItems: 'center' }}>
+                                    <img src={item.imagen_url} style={{ width: '50px', height: '60px', objectFit: 'cover', borderRadius: '8px' }} />
+                                    <div style={{ flex: 1 }}>
+                                        <h4 style={{ fontSize: '0.9rem', margin: 0 }}>{item.nombre}</h4>
+                                        <span style={{ fontSize: '0.85rem', fontWeight: 'bold' }}>₡{parseInt(item.tiene_descuento ? (item.precio_offer || item.precio_oferta) : item.precio).toLocaleString()}</span>
+                                    </div>
+                                    <button onClick={() => removeFromCart(item.cartId)} style={{ background: 'none', border: 'none', color: '#ff4444', cursor: 'pointer' }}>✕</button>
+                                </div>
+                            ))
+                        )}
+                    </div>
+
+                    {cart.length > 0 && (
+                        <div style={{ padding: '20px', background: '#fcfcfc', borderTop: '1px solid #eee' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', fontSize: '1.1rem', marginBottom: '10px' }}>
+                                <span>Total:</span>
+                                <span>₡{cartTotal.toLocaleString()}</span>
+                            </div>
+                            <div style={{ background: '#e9f7ef', padding: '10px', borderRadius: '8px', color: '#27ae60', fontSize: '0.8rem', textAlign: 'center', marginBottom: '15px', fontWeight: 'bold' }}>
+                                ✨ ¡Envío gratis en Guápiles Centro!
+                            </div>
+                            <button onClick={enviarPedidoWhatsApp} className="wa-button" style={{ 
+                                width: '100%', padding: '15px', borderRadius: '12px', background: '#25D366', color: 'white', 
+                                border: 'none', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer' 
+                            }}>
+                                Confirmar Pedido (WhatsApp)
+                            </button>
+                        </div>
+                    )}
+                </div>
+            )}
 
             {/* SECCIÓN NOSOTROS */}
             <section className="about-section">
@@ -177,8 +270,7 @@ function App() {
                     <div className="about-text">
                         <h2>Nuestra Historia</h2>
                         <p>
-                            En la lengua ancestral <strong>Bribri</strong>, <strong>Siwá</strong> es el viento, el soplo de vida y las historias que viajan con él. 
-                            Nuestra boutique en Pococí nace para ser ese viento fresco que trae lo mejor del mundo para vestir los momentos más importantes de tus hijos.
+                            En la lengua ancestral <strong>Bribri</strong>, <strong>Siwá</strong> es el viento... Enviamos a todo el país desde Guápiles.
                         </p>
                     </div>
                 </div>
@@ -189,41 +281,21 @@ function App() {
                 <div className="footer-top">
                     <div className="footer-column brand-col">
                         <div className="siwa-logo-footer">Siwá</div>
-                        <p>Moda infantil con propósito y raíz. Enviamos a todo el país desde Guápiles.</p>
-                        <div className="social-icons" style={{ display: 'flex', gap: '15px', marginTop: '15px' }}>
-                            <a href="https://instagram.com" target="_blank" rel="noreferrer" className="social-link" style={{ color: 'inherit' }}>
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
-                            </a>
-                            <a href="https://facebook.com" target="_blank" rel="noreferrer" className="social-link" style={{ color: 'inherit' }}>
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
-                            </a>
-                        </div>
+                        <p>Moda infantil con propósito y raíz.</p>
                     </div>
-
                     <div className="footer-column">
                         <h4>Categorías</h4>
-                        <ul>
-                            {['Bebé', 'Niño', 'Niña'].map(c => (
-                                <li key={c} onClick={() => navTo(c)} style={{ cursor: 'pointer' }}>{c}</li>
-                            ))}
-                        </ul>
+                        <ul>{['Bebé', 'Niño', 'Niña'].map(c => <li key={c} onClick={() => navTo(c)} style={{ cursor: 'pointer' }}>{c}</li>)}</ul>
                     </div>
-
                     <div className="footer-column">
                         <h4>Ayuda</h4>
-                        <ul>
-                            <li>Guía de Tallas</li>
-                            <li>Envíos</li>
-                            <li>Términos</li>
-                        </ul>
+                        <ul><li>Guía de Tallas</li><li>Envíos</li><li>Términos</li></ul>
                     </div>
-
                     <div className="footer-column">
                         <h4>Ubicación</h4>
                         <p>Guápiles, Pococí<br/>Limón, Costa Rica</p>
                     </div>
                 </div>
-
                 <div className="footer-bottom">
                     <div className="bottom-container">
                         <p>© 2026 Siwá Boutique. Todos los derechos reservados.</p>
