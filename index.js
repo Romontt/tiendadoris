@@ -235,6 +235,12 @@ function App() {
                                             WebkitBoxOrient: 'vertical',
                                             overflow: 'hidden'
                                         }}>{item.nombre}</h3>
+                                        
+                                        {/* --- SECCIÓN DE TALLAS --- */}
+                                        <div style={{ fontSize: '0.75rem', color: '#888', marginBottom: '8px' }}>
+                                            <strong>Tallas:</strong> {item.tallas || 'Única'}
+                                        </div>
+
                                         <div className="product-price" style={{ marginBottom: '12px', minHeight: '1.5rem' }}>
                                             {item.tiene_descuento ? (
                                                 <>
