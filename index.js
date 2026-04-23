@@ -6,8 +6,8 @@ function App() {
     const [loading, setLoading] = useState(true);
 
     const _supabase = supabase.createClient(
-        'https://hvnpkljyoocqdzwdptgt.supabase.co',
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2bnBrbGp5b29jcWR6d2RwdGd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2MTAxMTQsImV4cCI6MjA5MjE4NjExNH0.-pq3iVzqJsJCyGNXkFPlHSIQeBTrr7i7ptsY6FYjJZ0'
+        'https://hvProjectkljyoocqdzwdptgt.supabase.co',
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IjpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2bnBrbGp5b29jcWR6d2RwdGd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2MTAxMTQsImV4cCI6MjA5MjE4NjExNH0.-pq3iVzqJsJCyGNXkFPlHSIQeBTrr7i7ptsY6FYjJZ0'
     );
 
     useEffect(() => {
@@ -92,7 +92,7 @@ function App() {
                 <div className="hero-content">
                     <span className="hero-label">Colección 2026</span>
                     <h1>{cat === 'Todos' ? 'Historias que se visten' : `Especial ${cat}`}</h1>
-                    <p>Curaduría exclusiva de moda infantil. Calidad Premium para acompañar cada etapa de su crecimiento.</p>
+                    <p>Prendas elegidas con amor para acompañar cada pequeño gran paso y las historias que están por vivir.</p>
                 </div>
             </header>
 
