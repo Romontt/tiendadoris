@@ -50,7 +50,7 @@ function App() {
     useEffect(() => {
         const loadData = async () => {
             setLoading(true);
-            let q = _supabase.from('productos').select('*').eq('disponible', true);
+            let q = _supabase.from('productos').select('*').eq('disponible', true).gt('stock', 0);
             
             if (cat !== 'Todos') {
                 q = q.eq('categoria', cat);
@@ -70,10 +70,13 @@ function App() {
 
     // --- LÓGICA DE FUNCIONES DEL CARRITO ---
     const addToCart = (product) => {
-        const exists = cart.find(item => item.id === product.id);
-        if (!exists) {
+        // Contar cuántas unidades de este producto ya hay en el carrito
+        const countInCart = cart.filter(item => item.id === product.id).length;
+
+        // Si aún hay stock disponible comparado con lo que hay en el carrito
+        if (countInCart < product.stock) {
             setCart([...cart, { ...product, cartId: Date.now() + Math.random() }]);
-            // Rastrear clic en añadir
+            
             trackEvent('user_clicks', {
                 element_id: 'btn-add-to-cart',
                 click_text: `Añadir: ${product.nombre}`,
@@ -245,7 +248,9 @@ function App() {
                         margin: '0 auto'
                     }}>
                         {items.map(item => {
-                            const alreadyInCart = cart.some(c => c.id === item.id);
+                            const countInCart = cart.filter(c => c.id === item.id).length;
+                            const isOutOfStock = countInCart >= item.stock;
+                            
                             return (
                                 <article key={item.id} className="product-card" style={{ display: 'flex', flexDirection: 'column' }}>
                                     <div className="image-wrapper" 
@@ -274,6 +279,15 @@ function App() {
                                                 padding: '4px 8px',
                                                 left: '10px', top: '10px'
                                             }}>-{item.porcentaje_descuento}%</span>
+                                        )}
+                                        {/* ETIQUETA DE ÚNICA PIEZA / ÚLTIMA DISPONIBLE */}
+                                        {item.stock === 1 && (
+                                            <span style={{
+                                                position: 'absolute', bottom: '10px', right: '10px',
+                                                background: 'rgba(255,255,255,0.9)', padding: '4px 8px',
+                                                borderRadius: '6px', fontSize: '0.65rem', fontWeight: 'bold',
+                                                color: 'var(--rosa-siwa)', zIndex: 2
+                                            }}>Única pieza</span>
                                         )}
                                         <img 
                                             src={item.imagen_url} 
@@ -318,21 +332,21 @@ function App() {
                                         <button 
                                             className="wa-button"
                                             onClick={() => addToCart(item)}
-                                            disabled={alreadyInCart}
+                                            disabled={isOutOfStock}
                                             style={{ 
                                                 width: '100%', 
                                                 padding: '10px', 
                                                 borderRadius: '12px', 
                                                 fontSize: '0.8rem',
                                                 fontWeight: '600',
-                                                background: alreadyInCart ? '#ccc' : 'var(--verde-siwa)', 
+                                                background: isOutOfStock ? '#ccc' : 'var(--verde-siwa)', 
                                                 color: 'white', 
                                                 border: 'none', 
-                                                cursor: alreadyInCart ? 'default' : 'pointer',
+                                                cursor: isOutOfStock ? 'default' : 'pointer',
                                                 marginTop: 'auto'
                                             }}
                                         >
-                                            {alreadyInCart ? 'Ya en el carrito' : 'Añadir al carrito'}
+                                            {isOutOfStock ? 'Sin stock disponible' : 'Añadir al carrito'}
                                         </button>
                                     </div>
                                 </article>
