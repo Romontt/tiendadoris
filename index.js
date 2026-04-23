@@ -12,6 +12,9 @@ function App() {
     // --- ESTADO DE MODALES DE AYUDA ---
     const [helpModal, setHelpModal] = useState({ open: false, title: '', content: '' });
 
+    // --- ESTADO PARA VISOR DE FOTOS ---
+    const [selectedImage, setSelectedImage] = useState(null);
+
     const _supabase = supabase.createClient(
         'https://hvnpkljyoocqdzwdptgt.supabase.co',
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2bnBrbGp5b29jcWR6d2RwdGd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2MTAxMTQsImV4cCI6MjA5MjE4NjExNH0.-pq3iVzqJsJCyGNXkFPlHSIQeBTrr7i7ptsY6FYjJZ0'
@@ -99,20 +102,20 @@ function App() {
             }}>
                 <div className="logo-wrapper" style={{ flexShrink: 0 }}>
                     <div className="siwa-brand" style={{ 
-                        fontSize: isMobile ? '2rem' : '3.2rem', // Aumentado
+                        fontSize: isMobile ? '2rem' : '3.2rem',
                         lineHeight: '1',
-                        fontWeight: '900' // Grosor máximo para el nombre
+                        fontWeight: '900'
                     }}>
                         <span className="logo-symbol" style={{ fontWeight: '800' }}>@</span>
                         <span className="logo-text">Siwá</span>
                         <span className="logo-dot">.</span>
                     </div>
                     <small className="logo-tagline" style={{ 
-                        fontSize: isMobile ? '0.75rem' : '1.1rem', // Aumentado
+                        fontSize: isMobile ? '0.75rem' : '1.1rem',
                         letterSpacing: isMobile ? '2px' : '4px',
                         display: 'block',
                         marginTop: '6px',
-                        fontWeight: '800', // Más negrita
+                        fontWeight: '800',
                         textTransform: 'uppercase'
                     }}>
                         TIENDA VIRTUAL INFANTIL
@@ -195,15 +198,18 @@ function App() {
                             const alreadyInCart = cart.some(c => c.id === item.id);
                             return (
                                 <article key={item.id} className="product-card" style={{ background: 'transparent', display: 'flex', flexDirection: 'column' }}>
-                                    <div className="image-wrapper" style={{ 
-                                        width: '100%', 
-                                        aspectRatio: '4 / 5', 
-                                        borderRadius: '16px', 
-                                        overflow: 'hidden',
-                                        position: 'relative',
-                                        boxShadow: '0 4px 15px rgba(0,0,0,0.08)',
-                                        flexShrink: 0
-                                    }}>
+                                    <div className="image-wrapper" 
+                                        onClick={() => setSelectedImage(item.imagen_url)}
+                                        style={{ 
+                                            width: '100%', 
+                                            aspectRatio: '4 / 5', 
+                                            borderRadius: '16px', 
+                                            overflow: 'hidden',
+                                            position: 'relative',
+                                            boxShadow: '0 4px 15px rgba(0,0,0,0.08)',
+                                            flexShrink: 0,
+                                            cursor: 'zoom-in'
+                                        }}>
                                         {item.tiene_descuento && (
                                             <span className="promo-badge" style={{ 
                                                 position: 'absolute', 
@@ -279,6 +285,29 @@ function App() {
                     </div>
                 )}
             </main>
+
+            {/* MODAL VISOR DE IMAGEN */}
+            {selectedImage && (
+                <div 
+                    onClick={() => setSelectedImage(null)}
+                    style={{
+                        position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
+                        background: 'rgba(0,0,0,0.9)', zIndex: 3000, display: 'flex', 
+                        alignItems: 'center', justifyContent: 'center', padding: '20px',
+                        cursor: 'zoom-out'
+                    }}
+                >
+                    <button 
+                        onClick={() => setSelectedImage(null)}
+                        style={{ position: 'absolute', top: '20px', right: '20px', background: 'white', border: 'none', borderRadius: '50%', width: '40px', height: '40px', fontSize: '1.2rem', cursor: 'pointer', zIndex: 3001 }}
+                    >✕</button>
+                    <img 
+                        src={selectedImage} 
+                        style={{ maxWidth: '100%', maxHeight: '90vh', borderRadius: '8px', boxShadow: '0 0 20px rgba(0,0,0,0.5)' }} 
+                        alt="Vista ampliada"
+                    />
+                </div>
+            )}
 
             {isCartOpen && (
                 <div style={{
