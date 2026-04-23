@@ -99,7 +99,7 @@ function App() {
             }}>
                 <div className="logo-wrapper" style={{ flexShrink: 0 }}>
                     <div className="siwa-brand" style={{ 
-                        fontSize: isMobile ? '1.3rem' : '2.4rem', 
+                        fontSize: isMobile ? '1.8rem' : '2.8rem', // Aumentado
                         lineHeight: '1' 
                     }}>
                         <span className="logo-symbol">@</span>
@@ -107,10 +107,11 @@ function App() {
                         <span className="logo-dot">.</span>
                     </div>
                     <small className="logo-tagline" style={{ 
-                        fontSize: isMobile ? '0.55rem' : '0.85rem',
+                        fontSize: isMobile ? '0.65rem' : '0.95rem', // Aumentado
                         letterSpacing: isMobile ? '1px' : '3px',
                         display: 'block',
-                        marginTop: '4px'
+                        marginTop: '4px',
+                        fontWeight: '700' // Negrita para mejor legibilidad al ser más grande
                     }}>
                         TIENDA VIRTUAL INFANTIL
                     </small>
@@ -229,14 +230,13 @@ function App() {
                                             fontSize: isMobile ? '0.9rem' : '1.1rem', 
                                             margin: '4px 0', 
                                             lineHeight: '1.2',
-                                            minHeight: isMobile ? '2.2rem' : '2.6rem', // Estándar para 2 líneas
+                                            minHeight: isMobile ? '2.2rem' : '2.6rem',
                                             display: '-webkit-box',
                                             WebkitLineClamp: 2,
                                             WebkitBoxOrient: 'vertical',
                                             overflow: 'hidden'
                                         }}>{item.nombre}</h3>
                                         
-                                        {/* --- SECCIÓN DE TALLAS --- */}
                                         <div style={{ fontSize: '0.75rem', color: '#888', marginBottom: '8px' }}>
                                             <strong>Tallas:</strong> {item.tallas || 'Única'}
                                         </div>
@@ -265,7 +265,7 @@ function App() {
                                                 color: 'white', 
                                                 border: 'none', 
                                                 cursor: alreadyInCart ? 'default' : 'pointer',
-                                                marginTop: 'auto' // Empuja el botón al final
+                                                marginTop: 'auto'
                                             }}
                                         >
                                             {alreadyInCart ? 'Ya en el carrito' : 'Añadir al carrito'}
@@ -278,7 +278,6 @@ function App() {
                 )}
             </main>
 
-            {/* --- INTERFAZ DE CARRITO (OVERLAY) --- */}
             {isCartOpen && (
                 <div style={{
                     position: 'fixed', top: 0, right: 0, bottom: 0, width: isMobile ? '100%' : '400px',
@@ -327,7 +326,6 @@ function App() {
                 </div>
             )}
 
-            {/* --- MODAL DE INFORMACIÓN (ENVÍOS / TÉRMINOS) --- */}
             {helpModal.open && (
                 <div style={{
                     position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
