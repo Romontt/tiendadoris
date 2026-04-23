@@ -40,7 +40,6 @@
 
         @media (max-width: 900px) { .main-layout { grid-template-columns: 1fr; } }
 
-        /* Formulario */
         .form-card { background: var(--v-card); padding: 30px; border-radius: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.3); }
         .form-group { margin-bottom: 15px; }
         label { display: block; font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px; }
@@ -49,7 +48,6 @@
             background: var(--input-bg); color: white; font-family: inherit; box-sizing: border-box;
         }
 
-        /* Estilos de la Tarjeta (Igual a la Tienda) */
         .preview-sticky { position: sticky; top: 40px; text-align: center; }
         .product-card { 
             background: white; border-radius: 18px; overflow: hidden; width: 280px; 
@@ -91,9 +89,14 @@
             const [previewUrl, setPreviewUrl] = useState('');
             const [imageFile, setImageFile] = useState(null);
             const [form, setForm] = useState({
-                nombre: '', categoria: 'Bebé', tallas: '', precio: '',
-                tiene_descuento: false, porcentaje_descuento: 0,
-                es_pieza_unica: true, stock: 1
+                nombre: '', 
+                categoria: 'Bebé', 
+                tallas: '', 
+                precio: '',
+                tiene_descuento: false, 
+                porcentaje_descuento: 0,
+                es_pieza_unica: true, 
+                stock: 1
             });
 
             const _supabase = supabase.createClient(
@@ -121,15 +124,21 @@
 
                     const { data: { publicUrl } } = _supabase.storage.from('productos').getPublicUrl(fileName);
 
-                    const finalPrice = form.tiene_descuento ? form.precio - (form.precio * (form.porcentaje_descuento / 100)) : null;
+                    const basePrecio = parseFloat(form.precio);
+                    const finalPrice = form.tiene_descuento ? basePrecio - (basePrecio * (parseInt(form.porcentaje_descuento) / 100)) : null;
 
+                    // Ajuste para coincidir exactamente con las columnas de tu tabla
                     const { error: dbErr } = await _supabase.from('productos').insert([{
-                        ...form,
-                        precio: parseFloat(form.precio),
+                        nombre: form.nombre,
+                        categoria: form.categoria,
+                        tallas: form.tallas,
+                        precio: basePrecio,
+                        tiene_descuento: form.tiene_descuento,
                         porcentaje_descuento: parseInt(form.porcentaje_descuento),
                         precio_oferta: finalPrice,
                         imagen_url: publicUrl,
                         disponible: true,
+                        es_pieza_unica: form.es_pieza_unica,
                         stock: form.es_pieza_unica ? 1 : parseInt(form.stock)
                     }]);
 
@@ -152,7 +161,6 @@
                     </div>
 
                     <div className="main-layout">
-                        {/* COLUMNA IZQUIERDA: FORMULARIO */}
                         <form className="form-card" onSubmit={publicar}>
                             <div className="form-group">
                                 <label>Nombre del Producto</label>
@@ -218,7 +226,6 @@
                             </button>
                         </form>
 
-                        {/* COLUMNA DERECHA: PREVIEW DE LA TARJETA */}
                         <div className="preview-sticky">
                             <label style={{marginBottom: '20px', display: 'block'}}>Vista Previa en Tiempo Real</label>
                             <div className="product-card">
@@ -245,7 +252,6 @@
                                     </div>
                                 </div>
                             </div>
-                            <p style={{fontSize: '0.8rem', opacity: 0.5, marginTop: '20px'}}>* Así es como los clientes verán el producto en la web principal.</p>
                         </div>
                     </div>
                 </div>
