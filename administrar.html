@@ -40,7 +40,7 @@
         }
         .prod-img { width: 100px; height: 120px; border-radius: 12px; object-fit: cover; background: #000; }
         .prod-info { flex: 1; }
-        .prod-title { font-size: 1rem; font-weight: 700; margin: 0 0 10px 0; color: var(--naranja); }
+        .prod-title { font-size: 0.9rem; font-weight: 700; margin: 0 0 10px 0; color: var(--naranja); opacity: 0.8; }
 
         .edit-fields { display: grid; gap: 10px; }
         .field { display: flex; flex-direction: column; gap: 4px; }
@@ -145,15 +145,12 @@
 
                 try {
                     setSubiendo(true);
-
-                    // 1. Intentar borrar la imagen vieja del bucket si existe
                     if (producto.imagen_url) {
                         const urlParts = producto.imagen_url.split('/');
                         const oldFileName = urlParts[urlParts.length - 1];
                         await _supabase.storage.from('productos').remove([`productos/${oldFileName}`]);
                     }
 
-                    // 2. Subir la nueva imagen
                     const nombreArchivo = `${Date.now()}_${archivo.name}`;
                     const { error: uploadError } = await _supabase.storage
                         .from('productos')
@@ -161,7 +158,6 @@
 
                     if (uploadError) throw uploadError;
 
-                    // 3. Obtener URL pública
                     const { data: { publicUrl } } = _supabase.storage
                         .from('productos')
                         .getPublicUrl(`productos/${nombreArchivo}`);
@@ -186,9 +182,17 @@
                     </div>
 
                     <div className="prod-info">
-                        <h3 className="prod-title">{producto.nombre}</h3>
-                        
                         <div className="edit-fields">
+                            <div className="field">
+                                <label>Nombre del Producto</label>
+                                <input 
+                                    type="text" 
+                                    value={edit.nombre} 
+                                    onChange={e => setEdit({...edit, nombre: e.target.value})} 
+                                    placeholder="Ej. Conjunto de Verano"
+                                />
+                            </div>
+
                             <div className="field">
                                 <label>Precio (₡)</label>
                                 <input type="number" value={edit.precio} onChange={e => setEdit({...edit, precio: parseFloat(e.target.value)})} />
