@@ -17,7 +17,7 @@ function App() {
 
     const _supabase = supabase.createClient(
         'https://hvnpkljyoocqdzwdptgt.supabase.co',
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2bnBrbGp5b29jcWR6d2RwdGd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2MTAxMTQsImV4cCI6MjA5MjE4NjExNH0.-pq3iVzqJsJCyGNXkFPlHSIQeBTrr7i7ptsY6FYjJZ0'
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2bnBrbGp5b29jcWR6d2RwdGd0Iiwicm9sZSI6Imh2bnBrbGp5b29jcWR6d2RwdGd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2MTAxMTQsImV4cCI6MjA5MjE4NjExNH0.-pq3iVzqJsJCyGNXkFPlHSIQeBTrr7i7ptsY6FYjJZ0'
     );
 
     const sessionId = (() => {
@@ -74,7 +74,6 @@ function App() {
 
     const addToCart = (product) => {
         const countInCart = cart.filter(item => item.id === product.id).length;
-        // Solo permite agregar si no está ya en el carrito (bloqueo solicitado)
         if (countInCart === 0) {
             setCart([...cart, { ...product, cartId: Date.now() + Math.random() }]);
             trackEvent('user_clicks', 
@@ -105,7 +104,7 @@ function App() {
     }, 0);
 
     const enviarPedidoWhatsApp = async () => {
-        // 1. Guardar en la tabla "ventas" para que aparezca en ventas.html
+        // 1. Guardar en la tabla "ventas" para que aparezca en ventas.html como Pendiente
         try {
             const { error } = await _supabase.from('ventas').insert([
                 {
@@ -118,15 +117,18 @@ function App() {
             if (error) throw error;
         } catch (err) {
             console.error("Error al registrar venta:", err);
+            alert("Error al registrar la venta en el sistema.");
+            return; // No abrimos WhatsApp si no se pudo registrar
         }
 
-        // 2. Lógica de WhatsApp
+        // 2. Lógica de Seguimiento
         trackEvent('user_clicks', 
             { element_id: 'btn-confirm-whatsapp', click_text: 'Confirmar Pedido WhatsApp', page_path: window.location.pathname },
             'begin_checkout',
             { currency: 'CRC', value: cartTotal, items: cart.map(i => ({ item_id: i.id, item_name: i.nombre })) }
         );
 
+        // 3. Preparar mensaje de WhatsApp
         const mensajeBase = `¡Hola Siwá! 🌬️ Me interesa realizar el siguiente pedido:%0A%0A`;
         const itemsResumen = cart.reduce((acc, item) => {
             const precio = parseInt(item.tiene_descuento ? (item.precio_offer || item.precio_oferta) : item.precio);
@@ -144,7 +146,7 @@ function App() {
 
         const totalTexto = `%0A%0A*Total: ₡${cartTotal.toLocaleString()}*%0A_Envío gratis en Guápiles Centro_`;
         
-        // 3. Abrir WhatsApp, limpiar carrito y cerrar modal
+        // 4. Abrir WhatsApp, limpiar carrito y cerrar modal
         window.open(`https://wa.me/50683337497?text=${mensajeBase}${lista}${totalTexto}`);
         setCart([]);
         setIsCartOpen(false);
@@ -277,7 +279,6 @@ function App() {
                     }}>
                         {items.map(item => {
                             const isAdded = cart.some(c => c.id === item.id);
-                            // Solo bloqueamos si el stock real es 0 (agotado) o si ya está en el carrito
                             const isBlocked = item.stock <= 0 || isAdded;
                             
                             return (
@@ -340,203 +341,3 @@ function App() {
                                             display: '-webkit-box',
                                             WebkitLineClamp: 2,
                                             WebkitBoxOrient: 'vertical',
-                                            overflow: 'hidden'
-                                        }}>{item.nombre}</h3>
-                                        
-                                        <div style={{ fontSize: '0.75rem', color: '#888', marginBottom: '8px' }}>
-                                            <strong>Tallas:</strong> {item.tallas || 'Única'}
-                                        </div>
-
-                                        <div className="product-price" style={{ marginBottom: '12px', minHeight: '1.5rem' }}>
-                                            {item.tiene_descuento ? (
-                                                <>
-                                                    <span className="current-price" style={{ fontSize: '1rem', fontWeight: '700' }}>₡{parseInt(item.precio_offer || item.precio_oferta).toLocaleString()}</span>
-                                                    <span className="old-price" style={{ fontSize: '0.8rem', opacity: 0.5, textDecoration: 'line-through', marginLeft: '8px' }}>₡{parseInt(item.precio).toLocaleString()}</span>
-                                                </>
-                                            ) : (
-                                                <span className="current-price" style={{ fontSize: '1rem', fontWeight: '700' }}>₡{parseInt(item.precio).toLocaleString()}</span>
-                                            )}
-                                        </div>
-                                        <button 
-                                            className="wa-button"
-                                            onClick={() => addToCart(item)}
-                                            disabled={isBlocked}
-                                            style={{ 
-                                                width: '100%', 
-                                                padding: '10px', 
-                                                borderRadius: '12px', 
-                                                fontSize: '0.8rem',
-                                                fontWeight: '600',
-                                                background: item.stock <= 0 ? '#ccc' : (isAdded ? '#888' : 'var(--verde-siwa)'), 
-                                                color: 'white', 
-                                                border: 'none', 
-                                                cursor: isBlocked ? 'default' : 'pointer',
-                                                marginTop: 'auto'
-                                            }}
-                                        >
-                                            {item.stock <= 0 ? 'Sin stock disponible' : (isAdded ? 'Producto ya agregado al carrito' : 'Añadir al carrito')}
-                                        </button>
-                                    </div>
-                                </article>
-                            );
-                        })}
-                    </div>
-                )}
-            </main>
-
-            {/* MODAL VISOR DE IMAGEN */}
-            {selectedImage && (
-                <div 
-                    onClick={() => setSelectedImage(null)}
-                    style={{
-                        position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
-                        background: 'rgba(0,0,0,0.95)', zIndex: 3000, display: 'flex', 
-                        alignItems: 'center', justifyContent: 'center',
-                        cursor: 'zoom-out'
-                    }}
-                >
-                    <button 
-                        onClick={(e) => { e.stopPropagation(); setSelectedImage(null); }}
-                        style={{ 
-                            position: 'absolute', top: '25px', right: '25px', 
-                            background: 'white', border: 'none', borderRadius: '50%', 
-                            width: '44px', height: '44px', fontSize: '1.4rem', 
-                            cursor: 'pointer', zIndex: 3001, display: 'flex', 
-                            alignItems: 'center', justifyContent: 'center',
-                            boxShadow: '0 2px 10px rgba(0,0,0,0.3)',
-                            color: '#333'
-                        }}
-                    >✕</button>
-                    
-                    <div style={{ position: 'relative', width: '90%', height: '90%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <img 
-                            src={selectedImage} 
-                            style={{ 
-                                maxWidth: '100%', 
-                                maxHeight: '100%', 
-                                objectFit: 'contain', 
-                                borderRadius: '4px'
-                            }} 
-                            alt="Vista ampliada"
-                            onClick={(e) => e.stopPropagation()}
-                        />
-                    </div>
-                </div>
-            )}
-
-            {/* CARRITO LATERAL */}
-            {isCartOpen && (
-                <div style={{
-                    position: 'fixed', top: 0, right: 0, bottom: 0, width: isMobile ? '100%' : '400px',
-                    background: 'white', zIndex: 1001, boxShadow: '-5px 0 30px rgba(0,0,0,0.1)',
-                    display: 'flex', flexDirection: 'column', animation: 'slideIn 0.3s ease'
-                }}>
-                    <div style={{ padding: '20px', borderBottom: '1px solid #eee', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <h2 style={{ fontSize: '1.2rem', margin: 0 }}>Tu Carrito 🛒</h2>
-                        <button onClick={() => setIsCartOpen(false)} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer' }}>✕</button>
-                    </div>
-                    
-                    <div style={{ flex: 1, overflowY: 'auto', padding: '20px' }}>
-                        {cart.length === 0 ? (
-                            <p style={{ textAlign: 'center', color: '#999', marginTop: '40px' }}>El carrito está vacío</p>
-                        ) : (
-                            cart.map(item => (
-                                <div key={item.cartId} style={{ display: 'flex', gap: '15px', marginBottom: '15px', alignItems: 'center' }}>
-                                    <img src={item.imagen_url} style={{ width: '50px', height: '60px', objectFit: 'cover', borderRadius: '8px' }} />
-                                    <div style={{ flex: 1 }}>
-                                        <h4 style={{ fontSize: '0.9rem', margin: 0 }}>{item.nombre}</h4>
-                                        <span style={{ fontSize: '0.85rem', fontWeight: 'bold' }}>₡{parseInt(item.tiene_descuento ? (item.precio_offer || item.precio_oferta) : item.precio).toLocaleString()}</span>
-                                    </div>
-                                    <button onClick={() => removeFromCart(item.cartId)} style={{ background: 'none', border: 'none', color: '#ff4444', cursor: 'pointer' }}>✕</button>
-                                </div>
-                            ))
-                        )}
-                    </div>
-
-                    {cart.length > 0 && (
-                        <div style={{ padding: '20px', background: '#fcfcfc', borderTop: '1px solid #eee' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', fontSize: '1.1rem', marginBottom: '10px' }}>
-                                <span>Total:</span>
-                                <span>₡{cartTotal.toLocaleString()}</span>
-                            </div>
-                            <div style={{ background: '#e9f7ef', padding: '10px', borderRadius: '8px', color: '#27ae60', fontSize: '0.8rem', textAlign: 'center', marginBottom: '15px', fontWeight: 'bold' }}>
-                                ✨ ¡Envío gratis en Guápiles Centro!
-                            </div>
-                            <button onClick={enviarPedidoWhatsApp} style={{ 
-                                width: '100%', padding: '15px', borderRadius: '12px', background: '#25D366', color: 'white', 
-                                border: 'none', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer' 
-                            }}>
-                                Confirmar Pedido (WhatsApp)
-                            </button>
-                        </div>
-                    )}
-                </div>
-            )}
-
-            {/* MODAL DE AYUDA */}
-            {helpModal.open && (
-                <div style={{
-                    position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
-                    background: 'rgba(0,0,0,0.5)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px'
-                }}>
-                    <div style={{ background: 'white', padding: '30px', borderRadius: '20px', maxWidth: '500px', width: '100%', position: 'relative' }}>
-                        <button onClick={() => setHelpModal({ ...helpModal, open: false })} style={{ position: 'absolute', top: '15px', right: '15px', background: 'none', border: 'none', fontSize: '1.2rem', cursor: 'pointer' }}>✕</button>
-                        <h2 style={{ marginTop: 0, color: 'var(--rosa-siwa)' }}>{helpModal.title}</h2>
-                        <p style={{ lineHeight: '1.6', color: '#666' }}>{helpModal.content}</p>
-                        <button onClick={() => setHelpModal({ ...helpModal, open: false })} style={{ width: '100%', padding: '12px', borderRadius: '12px', background: '#333', color: 'white', border: 'none', marginTop: '20px', cursor: 'pointer' }}>Entendido</button>
-                    </div>
-                </div>
-            )}
-
-            <section className="about-section">
-                <div className="about-container">
-                    <div className="about-visual">
-                        <div className="floating-kite">◊</div>
-                    </div>
-                    <div className="about-text">
-                        <h2>Nuestra Historia</h2>
-                        <p>
-                            En la lengua ancestral <strong>Bribri</strong>, <strong>Siwá</strong> es el viento, el soplo de vida y las historias que viajan con él. 
-                            Nuestra tienda virtual en Guápiles nace para ser ese viento fresco que trae lo mejor del mundo para vestir los momentos más importantes de tus hijos.
-                        </p>
-                    </div>
-                </div>
-            </section>
-
-            <footer className="main-footer">
-                <div className="footer-top">
-                    <div className="footer-column brand-col">
-                        <div className="siwa-logo-footer" style={{ fontWeight: '900', fontSize: '2rem' }}>Siwá</div>
-                        <p>Moda infantil con propósito y raíz.</p>
-                    </div>
-                    <div className="footer-column">
-                        <h4>Categorías</h4>
-                        <ul>{['Bebé', 'Niño', 'Niña'].map(c => <li key={c} onClick={() => navTo(c)} style={{ cursor: 'pointer' }}>{c}</li>)}</ul>
-                    </div>
-                    <div className="footer-column">
-                        <h4>Ayuda</h4>
-                        <ul>
-                            <li onClick={() => openHelp('envios')} style={{ cursor: 'pointer' }}>Envíos</li>
-                            <li onClick={() => openHelp('terminos')} style={{ cursor: 'pointer' }}>Términos</li>
-                        </ul>
-                    </div>
-                    <div className="footer-column">
-                        <h4>Ubicación</h4>
-                        <p>Guápiles, Pococí<br/>Limón, Costa Rica</p>
-                    </div>
-                </div>
-                <div className="footer-bottom">
-                    <div className="bottom-container">
-                        <p>© 2026 Siwá Boutique. Todos los derechos reservados.</p>
-                        <p className="credit">
-                            By <a href="https://wa.me/50661961136" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}><strong>MONTZU</strong></a>
-                        </p>
-                    </div>
-                </div>
-            </footer>
-        </div>
-    );
-}
-
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(<App />);
