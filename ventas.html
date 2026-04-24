@@ -136,21 +136,10 @@
                 const totalVentasBruto = completed.reduce((acc, s) => acc + Number(s.total_amount || 0), 0);
                 
                 // 2. Cálculo de IVA (13% incluido en el total)
-                // Fórmula: Total - (Total / 1.13)
                 const totalIVA = totalVentasBruto - (totalVentasBruto / 1.13); 
                 
-                // 3. Ganancia Real Neta
-                // Si la base de datos ya tiene 'total_profit' calculado restando el costo, 
-                // debemos asegurarnos que ese profit no incluya el IVA.
-                // Suponiendo que 'total_profit' es (Precio Venta - Costo), le restamos el IVA.
-                const gananciaRealTotal = completed.reduce((acc, s) => {
-                    const montoVenta = Number(s.total_amount || 0);
-                    const ivaDeEstaVenta = montoVenta - (montoVenta / 1.13);
-                    const utilidadBruta = Number(s.total_profit || 0); // Esto suele ser (Venta - Costo)
-                    
-                    // Ganancia Neta = Utilidad Bruta - IVA
-                    return acc + (utilidadBruta - ivaDeEstaVenta);
-                }, 0);
+                // 3. Ganancia Real (Ingreso Bruto - IVA)
+                const gananciaRealTotal = totalVentasBruto - totalIVA;
                 
                 setMetrics({
                     total: totalVentasBruto,
@@ -226,7 +215,7 @@
                             <div className="stat-card card-profit">
                                 <h3>Ganancia Real</h3>
                                 <p>₡{Math.round(metrics.profit).toLocaleString('es-CR')}</p>
-                                <span className="txt-small">Utilidad (Sin IVA y sin Costos)</span>
+                                <span className="txt-small">Utilidad (Venta neta sin IVA)</span>
                             </div>
                             <div className="stat-card card-pending">
                                 <h3>Por Confirmar</h3>
@@ -257,7 +246,8 @@
                                                 const monto = Number(sale.total_amount || 0);
                                                 const subtotal = monto / 1.13;
                                                 const iva = monto - subtotal;
-                                                const gananciaLimpia = Number(sale.total_profit || 0) - iva;
+                                                // Ganancia de la fila individual (Precio sin IVA)
+                                                const gananciaFila = subtotal;
 
                                                 return (
                                                     <tr key={sale.id}>
@@ -269,7 +259,7 @@
                                                             <div className="txt-small">Base: ₡{Math.round(subtotal).toLocaleString()}</div>
                                                             <div className="txt-small">IVA: ₡{Math.round(iva).toLocaleString()}</div>
                                                             <div className="txt-small" style={{color: 'var(--verde-fino)', fontWeight: '600'}}>
-                                                                Utilidad: ₡{Math.round(gananciaLimpia).toLocaleString()}
+                                                                Subtotal neto: ₡{Math.round(gananciaFila).toLocaleString()}
                                                             </div>
                                                         </td>
                                                         <td style={{ fontWeight: '600' }}>
