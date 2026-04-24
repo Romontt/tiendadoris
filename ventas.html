@@ -146,6 +146,7 @@
             async function confirmSale(sale) {
                 if(!confirm(`¿Confirmar pago de "${sale.product_name}"?`)) return;
                 
+                // 1. Actualizar el estado de la venta
                 const { error: updateError } = await _supabase
                     .from('sales')
                     .update({ status: 'completed' })
@@ -156,12 +157,20 @@
                     return;
                 }
 
-                // GUÍA POR NOMBRE: Buscamos en productos donde el nombre coincida
+                // 2. NUEVA LÓGICA: Marcar como vendido y volver a poner disponible en True 
+                // para que se muestre con la etiqueta de "Vendido"
                 if (sale.product_name) {
-                    await _supabase
+                    const { error: prodError } = await _supabase
                         .from('productos')
-                        .update({ disponible: false })
+                        .update({ 
+                            disponible: true, 
+                            vendido: true 
+                        })
                         .eq('nombre', sale.product_name);
+                    
+                    if (prodError) {
+                        console.error("Error al actualizar producto:", prodError.message);
+                    }
                 }
 
                 fetchSales();
@@ -180,20 +189,15 @@
                     return;
                 }
 
-                // GUÍA POR NOMBRE: Buscamos en productos donde el nombre coincida para ponerlo disponible
+                // Restaurar disponibilidad normal si se cancela la orden
                 if (sale.product_name) {
-                    const { error: prodError } = await _supabase
+                    await _supabase
                         .from('productos')
-                        .update({ disponible: true })
+                        .update({ 
+                            disponible: true,
+                            vendido: false
+                        })
                         .eq('nombre', sale.product_name);
-                    
-                    if (prodError) {
-                        console.error("Error al restaurar por nombre:", prodError.message);
-                    } else {
-                        console.log("Producto restaurado correctamente usando el nombre");
-                    }
-                } else {
-                    console.error("No se pudo restaurar: La venta no tiene product_name");
                 }
 
                 fetchSales();
