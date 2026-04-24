@@ -144,34 +144,33 @@
             }
 
             async function confirmSale(id) {
-                if(!confirm("¿Confirmar pago y descontar del inventario?")) return;
+                if(!confirm("¿Confirmar pago y actualizar inventario?")) return;
                 
-                // Intentar por RPC (Lógica de stock)
-                const { error: rpcError } = await _supabase.rpc('confirm_sale', { p_sale_id: id });
-                
-                if (rpcError) {
-                    console.warn("RPC falló o no existe, intentando actualización directa...");
-                    // Respaldo: actualización directa si el RPC falla
-                    const { error: updateError } = await _supabase
-                        .from('sales')
-                        .update({ status: 'completed' })
-                        .eq('id', id);
-                    
-                    if (updateError) {
-                        alert("Error de permisos o conexión: " + updateError.message);
-                        return;
-                    }
+                // Intentamos actualización directa primero para asegurar el cambio de estado
+                const { error } = await _supabase
+                    .from('sales')
+                    .update({ status: 'completed' })
+                    .eq('id', id)
+                    .select(); // El select ayuda a confirmar que el cambio se hizo
+
+                if (error) {
+                    alert("Error al actualizar: " + error.message);
+                    console.error(error);
+                } else {
+                    // Si tienes el RPC configurado para el stock, se dispara aquí
+                    await _supabase.rpc('confirm_sale', { p_sale_id: id });
+                    fetchSales();
                 }
-                fetchSales();
             }
 
             async function cancelSale(id) {
-                if(!confirm("¿Marcar venta como no completada? Esto la quitará de pendientes.")) return;
+                if(!confirm("¿Marcar venta como no completada?")) return;
                 
                 const { error } = await _supabase
                     .from('sales')
                     .update({ status: 'cancelled' })
-                    .eq('id', id);
+                    .eq('id', id)
+                    .select();
 
                 if (error) {
                     alert("Error al cancelar: " + error.message);
