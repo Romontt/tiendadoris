@@ -46,6 +46,28 @@ function App() {
         }
     };
 
+    // --- FUNCIÓN PARA COMPARTIR ---
+    const handleShare = async (e, item) => {
+        e.stopPropagation(); // Evita abrir el zoom de la imagen
+        const shareData = {
+            title: item.nombre,
+            text: `¡Mira qué belleza encontré en Siwá! 😍: ${item.nombre}`,
+            url: window.location.href
+        };
+
+        try {
+            if (navigator.share) {
+                await navigator.share(shareData);
+                trackEvent('user_clicks', { element_id: 'btn-share', click_text: `Compartir: ${item.nombre}` });
+            } else {
+                await navigator.clipboard.writeText(window.location.href);
+                alert('Enlace copiado al portapapeles');
+            }
+        } catch (err) {
+            console.log('Error sharing:', err);
+        }
+    };
+
     // --- EFECTO PARA MANEJAR BOTÓN ATRÁS (VISOR DE IMAGEN) ---
     useEffect(() => {
         if (selectedImage) {
@@ -313,6 +335,19 @@ function App() {
                                             flexShrink: 0,
                                             cursor: 'zoom-in'
                                         }}>
+                                        {/* BOTÓN COMPARTIR */}
+                                        <button 
+                                            onClick={(e) => handleShare(e, item)}
+                                            style={{
+                                                position: 'absolute', top: '10px', right: '10px', zIndex: 5,
+                                                background: 'rgba(255,255,255,0.85)', border: 'none', borderRadius: '50%',
+                                                width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                cursor: 'pointer', boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
+                                            }}
+                                        >
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
+                                        </button>
+
                                         {item.tiene_descuento && (
                                             <span className="promo-badge" style={{ 
                                                 position: 'absolute', 
