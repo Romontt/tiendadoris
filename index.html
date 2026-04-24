@@ -1,35 +1,57 @@
 <!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#ffffff" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>SIWÁ Boutique | Moda Infantil Exclusiva en Pococí</title>
+    <meta name="description" content="Moda infantil premium en Pococí. Descubre conjuntos exclusivos para bebés, niños y niñas con el estilo único de SIWÁ Boutique. Envíos a todo Costa Rica.">
+    <meta name="keywords" content="boutique infantil Pococí, ropa de niños Costa Rica, SIWÁ Boutique, moda bebés premium, ropa infantil Guápiles">
+    <meta name="author" content="SIWÁ Boutique">
+    <link rel="canonical" href="https://siwa.montzucr.com/">
 
-    <title>Siwa - Tienda Virtual Infantil</title>
-    <meta name="description" content="Moda y detalles seleccionados para tus pequeños con un estilo premium y artesanal." />
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
 
-    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
-    <link rel="icon" type="image/webp" sizes="32x32" href="%PUBLIC_URL%/isoti.webp" />
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/isoti.webp" />
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://siwa.montzucr.com/">
+    <meta property="og:title" content="SIWÁ Boutique | Moda Infantil Exclusiva">
+    <meta property="og:description" content="Ropa premium para los más pequeños. Calidad y elegancia en cada prenda.">
+    <meta property="og:image" content="https://siwa.montzucr.com/og-image.jpg">
 
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://siwa.montzucr.com/" />
-    <meta property="og:title" content="Siwa - Tienda Virtual Infantil" />
-    <meta property="og:description" content="Detalles únicos para los más pequeños. Calidad y diseño en cada prenda." />
-    <meta property="og:image" content="https://siwa.montzucr.com/og-image.webp" />
-    <meta property="og:image:type" content="image/webp" />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://siwa.montzucr.com/">
+    <meta property="twitter:title" content="SIWÁ Boutique | Moda Infantil Exclusiva">
+    <meta property="twitter:description" content="Ropa premium para los más pequeños. Calidad y elegancia en cada prenda.">
+    <meta property="twitter:image" content="https://siwa.montzucr.com/og-image.jpg">
 
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Siwa - Tienda Virtual Infantil" />
-    <meta name="twitter:description" content="Detalles únicos para los más pequeños." />
-    <meta name="twitter:image" content="https://siwa.montzucr.com/og-image.webp" />
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600&family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="estilos.css">
+    
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
 
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-  </head>
-  <body>
-    <noscript>Necesitas habilitar JavaScript para ejecutar esta aplicación.</noscript>
-    <div id="root"></div>
-  </body>
+    <div id="root">
+        <div style="height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; background: #0a1f1a;">
+            <p style="color: #d46a4e; font-family: 'Outfit', sans-serif; letter-spacing: 2px; margin-bottom: 10px;">CARGANDO SIWÁ...</p>
+            <div style="width: 40px; height: 2px; background: rgba(212, 106, 78, 0.3); position: relative; overflow: hidden;">
+                <div style="position: absolute; width: 20px; height: 100%; background: #d46a4e; animation: load 1.5s infinite ease-in-out;"></div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        @keyframes load {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+    </style>
+
+    <script type="text/babel" src="index.js"></script>
+
+</body>
 </html>
