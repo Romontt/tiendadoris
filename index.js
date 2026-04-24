@@ -1,4 +1,5 @@
 const { useState, useEffect } = React;
+
 // --- CONFIGURACIÓN FUERA DEL COMPONENTE (EVITA RE-CREACIÓN) ---
 const _supabase = supabase.createClient(
     'https://hvnpkljyoocqdzwdptgt.supabase.co',
@@ -12,6 +13,7 @@ const sessionId = (() => {
     }
     return id;
 })();
+
 function App() {
     const [items, setItems] = useState([]);
     const [cat, setCat] = useState('Todos');
@@ -23,6 +25,7 @@ function App() {
     const [helpModal, setHelpModal] = useState({ open: false, title: '', content: '' });
     // --- ESTADO PARA VISOR DE FOTOS ---
     const [selectedImage, setSelectedImage] = useState(null);
+
     const trackEvent = async (table, data, gaEventName = null, gaParams = {}) => {
         try {
             await _supabase.from(table).insert([{ ...data, session_id: sessionId }]);
@@ -38,7 +41,7 @@ function App() {
             console.error("Tracking error:", e);
         }
     };
-    // --- FUNCION COMPARTIR ---
+
     const shareProduct = async (e, item) => {
         e.stopPropagation();
         const shareData = {
@@ -58,7 +61,7 @@ function App() {
             console.log('Error sharing:', err);
         }
     };
-    // --- EFECTO PARA MANEJAR BOTÓN ATRÁS (VISOR DE IMAGEN) ---
+
     useEffect(() => {
         if (selectedImage) {
             window.history.pushState({ modalOpen: true }, "");
@@ -69,6 +72,7 @@ function App() {
         window.addEventListener('popstate', handlePopState);
         return () => window.removeEventListener('popstate', handlePopState);
     }, [selectedImage]);
+
     useEffect(() => {
         const path = cat === 'Todos' ? '/' : `/${cat}`;
         trackEvent('page_views', 
@@ -77,11 +81,13 @@ function App() {
             { page_title: `Categoría: ${cat}`, page_location: window.location.href }
         );
     }, [cat]);
+
     useEffect(() => {
         const loadData = async () => {
             setLoading(true);
             try {
-                let q = _supabase.from('productos').select('*').eq('disponible', true);
+                // Eliminamos .eq('disponible', true) para poder mostrar los vendidos con etiqueta
+                let q = _supabase.from('productos').select('*');
                 if (cat !== 'Todos') {
                     q = q.eq('categoria', cat);
                 }
@@ -96,9 +102,10 @@ function App() {
         };
         loadData();
     }, [cat]);
+
     const addToCart = (product) => {
         const isAlreadyInCart = cart.some(item => item.id === product.id);
-        if (!isAlreadyInCart && product.stock > 0) {
+        if (!isAlreadyInCart && product.stock > 0 && product.disponible) {
             setCart([...cart, { ...product, cartId: Date.now() + Math.random() }]);
             trackEvent('user_clicks', 
                 { element_id: 'btn-add-to-cart', click_text: `Añadir: ${product.nombre}`, page_path: window.location.pathname },
@@ -111,6 +118,7 @@ function App() {
             );
         }
     };
+
     const removeFromCart = (cartId) => {
         const item = cart.find(i => i.cartId === cartId);
         setCart(cart.filter(item => item.cartId !== cartId));
@@ -120,10 +128,12 @@ function App() {
             { items: [{ item_id: item?.id, item_name: item?.nombre }] }
         );
     };
+
     const cartTotal = cart.reduce((acc, item) => {
         const precio = item.tiene_descuento ? (item.precio_offer || item.precio_oferta) : item.precio;
         return acc + parseInt(precio);
     }, 0);
+
     const enviarPedidoWhatsApp = async () => {
         if (cart.length === 0) return;
         const mensajeBase = `¡Hola Siwá! 🌬️ Me interesa realizar el siguiente pedido:%0A%0A`;
@@ -160,17 +170,19 @@ function App() {
             window.open(fullLink, '_blank');
             setCart([]);
             setIsCartOpen(false);            
-            const { data: newData } = await _supabase.from('productos').select('*').eq('disponible', true);
+            const { data: newData } = await _supabase.from('productos').select('*');
             setItems(newData || []);
         } catch (err) {
             console.error("Error en el proceso de compra:", err);
             alert("Hubo un problema al procesar tu pedido. Por favor, intenta de nuevo.");
         }
     };
+
     const navTo = (nuevaCat) => {
         setCat(nuevaCat);
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
+
     const openHelp = (type) => {
         const info = {
             envios: { title: 'Políticas de Envío 🚚', content: 'Realizamos envíos a todo el país vía Correos de Costa Rica. En Guápiles Centro el envío es gratuito. Para el resto del país, el costo se calcula según la zona.' },
@@ -183,7 +195,9 @@ function App() {
         );
         setHelpModal({ open: true, ...info[type] });
     };
+
     const isMobile = window.innerWidth < 768;
+
     return (
         <div className={`app-container tema-${cat}`} style={{ boxSizing: 'border-box' }}>
             <nav className="nav-bar" style={{ 
@@ -278,9 +292,10 @@ function App() {
                         {items.map(item => {
                             const isAdded = cart.some(c => c.id === item.id);
                             const isOutOfStock = item.stock <= 0;
-                            const isBlocked = isOutOfStock || isAdded;                            
+                            const isSold = item.disponible === false;
+                            const isBlocked = isOutOfStock || isAdded || isSold;                            
                             return (
-                                <article key={item.id} className="product-card" style={{ display: 'flex', flexDirection: 'column' }}>
+                                <article key={item.id} className="product-card" style={{ display: 'flex', flexDirection: 'column', opacity: isSold ? 0.7 : 1 }}>
                                     <div className="image-wrapper" 
                                         onClick={() => {
                                             setSelectedImage(item.imagen_url);
@@ -299,7 +314,16 @@ function App() {
                                             flexShrink: 0,
                                             cursor: 'zoom-in'
                                         }}>
-                                        {item.tiene_descuento && (
+                                        {isSold && (
+                                            <span style={{
+                                                position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%) rotate(-15deg)',
+                                                background: 'rgba(255, 255, 255, 0.9)', color: '#d32f2f', padding: '8px 20px',
+                                                borderRadius: '8px', fontSize: '1.2rem', fontWeight: '900', border: '3px solid #d32f2f',
+                                                zIndex: 10, pointerEvents: 'none', boxShadow: '0 4px 10px rgba(0,0,0,0.2)',
+                                                textTransform: 'uppercase'
+                                            }}>Vendido</span>
+                                        )}
+                                        {item.tiene_descuento && !isSold && (
                                             <span className="promo-badge" style={{ 
                                                 position: 'absolute', 
                                                 zIndex: 2,
@@ -319,7 +343,7 @@ function App() {
                                         >
                                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
                                         </button>
-                                        {item.stock === 1 && !isOutOfStock && (
+                                        {item.stock === 1 && !isOutOfStock && !isSold && (
                                             <span style={{
                                                 position: 'absolute', bottom: '10px', right: '10px',
                                                 background: 'rgba(255,255,255,0.9)', padding: '4px 8px',
@@ -331,7 +355,7 @@ function App() {
                                             src={item.imagen_url} 
                                             alt={item.nombre} 
                                             loading="lazy" 
-                                            style={{ width: '100%', height: '100%', objectFit: 'cover', filter: isOutOfStock ? 'grayscale(1)' : 'none' }}
+                                            style={{ width: '100%', height: '100%', objectFit: 'cover', filter: (isOutOfStock || isSold) ? 'grayscale(1)' : 'none' }}
                                         />
                                     </div>
                                     <div className="product-info" style={{ 
@@ -376,14 +400,14 @@ function App() {
                                                 borderRadius: '12px', 
                                                 fontSize: '0.8rem',
                                                 fontWeight: '600',
-                                                background: isOutOfStock ? '#ccc' : (isAdded ? '#888' : 'var(--verde-siwa)'), 
+                                                background: isSold ? '#555' : (isOutOfStock ? '#ccc' : (isAdded ? '#888' : 'var(--verde-siwa)')), 
                                                 color: 'white', 
                                                 border: 'none', 
                                                 cursor: isBlocked ? 'default' : 'pointer',
                                                 marginTop: 'auto'
                                             }}
                                         >
-                                            {isOutOfStock ? 'Agotado' : (isAdded ? 'En el carrito' : 'Añadir al carrito')}
+                                            {isSold ? 'Vendido' : (isOutOfStock ? 'Agotado' : (isAdded ? 'En el carrito' : 'Añadir al carrito'))}
                                         </button>
                                     </div>
                                 </article>
@@ -478,6 +502,9 @@ function App() {
                     )}
                 </div>
             )}
+        </div>
+    );
+}
             {/* MODAL DE AYUDA */}
             {helpModal.open && (
                 <div style={{
