@@ -227,7 +227,7 @@ function App() {
                         >
                             {c}
                         </button>
-                    ))}                    
+                    ))}                     
                     <button onClick={() => setIsCartOpen(!isCartOpen)} style={{
                         background: '#f8f8f8', border: 'none', padding: isMobile ? '8px' : '10px', borderRadius: '50%',
                         position: 'relative', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -278,7 +278,8 @@ function App() {
                         {items.map(item => {
                             const isAdded = cart.some(c => c.id === item.id);
                             const isOutOfStock = item.stock <= 0;
-                            const isBlocked = isOutOfStock || isAdded;                            
+                            const isSoldOut = item.vendido === true;
+                            const isBlocked = isOutOfStock || isAdded || isSoldOut;                            
                             return (
                                 <article key={item.id} className="product-card" style={{ display: 'flex', flexDirection: 'column' }}>
                                     <div className="image-wrapper" 
@@ -299,7 +300,7 @@ function App() {
                                             flexShrink: 0,
                                             cursor: 'zoom-in'
                                         }}>
-                                        {item.tiene_descuento && (
+                                        {item.tiene_descuento && !isSoldOut && (
                                             <span className="promo-badge" style={{ 
                                                 position: 'absolute', 
                                                 zIndex: 2,
@@ -307,6 +308,19 @@ function App() {
                                                 padding: '4px 8px',
                                                 left: '10px', top: '10px'
                                             }}>-{item.porcentaje_descuento}%</span>
+                                        )}
+                                        {isSoldOut && (
+                                            <span style={{ 
+                                                position: 'absolute', 
+                                                zIndex: 3,
+                                                fontSize: '0.75rem',
+                                                padding: '6px 12px',
+                                                background: '#333',
+                                                color: 'white',
+                                                fontWeight: 'bold',
+                                                borderRadius: '0 0 10px 0',
+                                                left: 0, top: 0
+                                            }}>VENDIDO</span>
                                         )}
                                         <button 
                                             onClick={(e) => shareProduct(e, item)}
@@ -319,7 +333,7 @@ function App() {
                                         >
                                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
                                         </button>
-                                        {item.stock === 1 && !isOutOfStock && (
+                                        {item.stock === 1 && !isOutOfStock && !isSoldOut && (
                                             <span style={{
                                                 position: 'absolute', bottom: '10px', right: '10px',
                                                 background: 'rgba(255,255,255,0.9)', padding: '4px 8px',
@@ -331,7 +345,7 @@ function App() {
                                             src={item.imagen_url} 
                                             alt={item.nombre} 
                                             loading="lazy" 
-                                            style={{ width: '100%', height: '100%', objectFit: 'cover', filter: isOutOfStock ? 'grayscale(1)' : 'none' }}
+                                            style={{ width: '100%', height: '100%', objectFit: 'cover', filter: (isOutOfStock || isSoldOut) ? 'grayscale(1)' : 'none' }}
                                         />
                                     </div>
                                     <div className="product-info" style={{ 
@@ -376,14 +390,14 @@ function App() {
                                                 borderRadius: '12px', 
                                                 fontSize: '0.8rem',
                                                 fontWeight: '600',
-                                                background: isOutOfStock ? '#ccc' : (isAdded ? '#888' : 'var(--verde-siwa)'), 
+                                                background: isSoldOut ? '#555' : (isOutOfStock ? '#ccc' : (isAdded ? '#888' : 'var(--verde-siwa)')), 
                                                 color: 'white', 
                                                 border: 'none', 
                                                 cursor: isBlocked ? 'default' : 'pointer',
                                                 marginTop: 'auto'
                                             }}
                                         >
-                                            {isOutOfStock ? 'Agotado' : (isAdded ? 'En el carrito' : 'Añadir al carrito')}
+                                            {isSoldOut ? 'Vendido' : (isOutOfStock ? 'Agotado' : (isAdded ? 'En el carrito' : 'Añadir al carrito'))}
                                         </button>
                                     </div>
                                 </article>
