@@ -37,7 +37,6 @@
 
         .container { padding: 30px 5%; max-width: 1300px; margin: 0 auto; }
 
-        /* Dashboard de Métricas */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -61,7 +60,6 @@
         .card-profit { border-color: var(--verde-fino); color: var(--verde-fino); }
         .card-pending { border-color: #f1c40f; }
 
-        /* Tabla Estilizada */
         .table-container {
             background: white;
             border-radius: 25px;
@@ -74,20 +72,16 @@
         th { padding: 18px; text-align: left; color: #7f8c8d; font-size: 0.9rem; }
         td { padding: 18px; border-bottom: 1px solid #f1f1f1; font-size: 0.95rem; }
 
-        /* Estados */
         .badge { padding: 5px 12px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; }
         .badge-pending { background: #fff3e0; color: #e67e22; }
         .badge-completed { background: #e8f5e9; color: #2d5a4c; }
 
-        /* Botones */
         .btn-confirm { 
             background: var(--verde-fino); color: white; border: none; 
             padding: 8px 16px; border-radius: 10px; cursor: pointer; font-weight: 600;
         }
         .btn-confirm:hover { transform: scale(1.05); background: #1e3d33; }
-
         .btn-back { color: white; text-decoration: none; font-size: 0.9rem; display: flex; align-items: center; gap: 5px; }
-        
         .txt-small { font-size: 0.75rem; color: #95a5a6; display: block; }
     </style>
 </head>
@@ -95,6 +89,8 @@
     <div id="root"></div>
     <script type="text/babel">
         const { useState, useEffect } = React;
+        
+        // Cliente de Supabase conectado a tu proyecto
         const _supabase = supabase.createClient('https://hvnpkljyoocqdzwdptgt.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2bnBrbGp5b29jcWR6d2RwdGd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2MTAxMTQsImV4cCI6MjA5MjE4NjExNH0.-pq3iVzqJsJCyGNXkFPlHSIQeBTrr7i7ptsY6FYjJZ0');
 
         function App() {
@@ -104,7 +100,17 @@
             useEffect(() => { fetchSales(); }, []);
 
             async function fetchSales() {
-                const { data } = await _supabase.from('sales').select('*').order('created_at', { ascending: false });
+                // Jala los datos directamente de la tabla 'sales' que vimos en tus capturas
+                const { data, error } = await _supabase
+                    .from('sales')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                
+                if (error) {
+                    console.error("Error cargando ventas:", error);
+                    return;
+                }
+
                 if (data) {
                     setSales(data);
                     calculateMetrics(data);
@@ -112,15 +118,13 @@
             }
 
             function calculateMetrics(allSales) {
+                // Filtramos solo las completadas para las métricas de dinero real
                 const completed = allSales.filter(s => s.status === 'completed');
                 
-                // El total ya incluye IVA, lo desglosamos para Doris
-                const totalVentas = completed.reduce((acc, s) => acc + Number(s.total_amount), 0);
-                const totalIVA = totalVentas - (totalVentas / 1.13); // Cálculo del 13% incluido
-                const gananciaBruta = completed.reduce((acc, s) => acc + Number(s.total_profit), 0);
-                
-                // Ganancia Neta sugerida (restando IVA de la ganancia si Doris asume el costo)
-                // O simplemente mostrar la ganancia configurada en sales_items
+                // total_amount y total_profit vienen de tu tabla en Supabase
+                const totalVentas = completed.reduce((acc, s) => acc + Number(s.total_amount || 0), 0);
+                const totalIVA = totalVentas - (totalVentas / 1.13); 
+                const gananciaBruta = completed.reduce((acc, s) => acc + Number(s.total_profit || 0), 0);
                 
                 setMetrics({
                     total: totalVentas,
@@ -131,16 +135,23 @@
             }
 
             async function confirmSale(id) {
-                if(!confirm("¿Deseas confirmar esta venta? Esto descontará el inventario.")) return;
+                if(!confirm("¿Deseas confirmar esta venta? Esto ejecutará la lógica de inventario en la base de datos.")) return;
+                
+                // Llama a la función RPC 'confirm_sale' que debe estar en tu Supabase
+                // Esta función es la que debe cambiar el estado a 'completed' y restar stock
                 const { error } = await _supabase.rpc('confirm_sale', { p_sale_id: id });
-                if (error) alert("Error al confirmar: " + error.message);
-                else fetchSales();
+                
+                if (error) {
+                    alert("Error al confirmar: " + error.message);
+                } else {
+                    fetchSales(); // Recarga los datos para ver los cambios
+                }
             }
 
             return (
                 <div>
                     <header>
-                        <a href="admin.html" className="btn-back"><span>←</span> Panel Principal</a>
+                        <a href="index.html" className="btn-back"><span>←</span> Volver a Tienda</a>
                         <h1 style={{fontFamily: 'Playfair Display', margin: 0, fontSize: '1.2rem'}}>SIWA FINANCE</h1>
                         <div style={{width: '100px'}}></div>
                     </header>
@@ -150,7 +161,7 @@
                             <div className="stat-card card-total">
                                 <h3>Ingresos Totales</h3>
                                 <p>₡{metrics.total.toLocaleString('es-CR')}</p>
-                                <span className="txt-small">Ventas confirmadas (IVA incl.)</span>
+                                <span className="txt-small">Ventas pagadas (IVA incl.)</span>
                             </div>
                             <div className="stat-card card-iva">
                                 <h3>IVA por Reservar</h3>
@@ -158,14 +169,14 @@
                                 <span className="txt-small">Monto del 13% recolectado</span>
                             </div>
                             <div className="stat-card card-profit">
-                                <h3>Ganancia Bruta</h3>
+                                <h3>Ganancia Real</h3>
                                 <p>₡{metrics.profit.toLocaleString('es-CR')}</p>
-                                <span className="txt-small">Venta menos costo de prenda</span>
+                                <span className="txt-small">Basado en costo de prendas</span>
                             </div>
                             <div className="stat-card card-pending">
                                 <h3>Por Confirmar</h3>
                                 <p>{metrics.pending}</p>
-                                <span className="txt-small">Pedidos en espera</span>
+                                <span className="txt-small">Pedidos pendientes de pago</span>
                             </div>
                         </div>
 
@@ -182,21 +193,22 @@
                                 </thead>
                                 <tbody>
                                     {sales.map(sale => {
-                                        const subtotal = sale.total_amount / 1.13;
-                                        const iva = sale.total_amount - subtotal;
+                                        const subtotal = Number(sale.total_amount) / 1.13;
+                                        const iva = Number(sale.total_amount) - subtotal;
                                         return (
                                             <tr key={sale.id}>
                                                 <td>
-                                                    <strong>{sale.customer_name || 'Pedido Web'}</strong>
+                                                    <strong>{sale.customer_name || 'Cliente Web'}</strong>
                                                     <span className="txt-small">{new Date(sale.created_at).toLocaleDateString()}</span>
                                                 </td>
                                                 <td>
-                                                    <div className="txt-small">Base: ₡{Math.round(subtotal).toLocaleString()}</div>
+                                                    <div className="txt-small">Subtotal: ₡{Math.round(subtotal).toLocaleString()}</div>
                                                     <div className="txt-small">IVA (13%): ₡{Math.round(iva).toLocaleString()}</div>
+                                                    <div className="txt-small" style={{color: 'var(--verde-fino)'}}>Ganancia: ₡{Number(sale.total_profit || 0).toLocaleString()}</div>
                                                 </td>
                                                 <td style={{ fontWeight: '600', color: 'var(--azul-navy)' }}>
-    ₡{Number(sale.total_amount).toLocaleString('es-CR')}
-</td>
+                                                    ₡{Number(sale.total_amount).toLocaleString('es-CR')}
+                                                </td>
                                                 <td>
                                                     <span className={`badge badge-${sale.status}`}>
                                                         {sale.status === 'pending' ? 'Pendiente' : 'Pagado'}
@@ -208,7 +220,7 @@
                                                             Confirmar Pago
                                                         </button>
                                                     ) : (
-                                                        <span style={{color: '#bdc3c7', fontSize: '0.8rem'}}>✓ Procesada</span>
+                                                        <span style={{color: '#bdc3c7', fontSize: '0.8rem'}}>✓ Inventario actualizado</span>
                                                     )}
                                                 </td>
                                             </tr>
