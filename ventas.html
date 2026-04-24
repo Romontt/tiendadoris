@@ -144,7 +144,7 @@
             }
 
             async function confirmSale(sale) {
-                if(!confirm("¿Confirmar pago? La prenda quedará marcada como NO disponible.")) return;
+                if(!confirm(`¿Confirmar pago de "${sale.product_name}"?`)) return;
                 
                 const { error: updateError } = await _supabase
                     .from('sales')
@@ -156,22 +156,20 @@
                     return;
                 }
 
-                if (sale.product_id) {
+                // GUÍA POR NOMBRE: Buscamos en productos donde el nombre coincida
+                if (sale.product_name) {
                     await _supabase
                         .from('productos')
                         .update({ disponible: false })
-                        .eq('id', sale.product_id);
+                        .eq('nombre', sale.product_name);
                 }
 
                 fetchSales();
             }
 
             async function cancelSale(sale) {
-                if(!confirm("¿Anular esta venta? La prenda volverá a estar disponible.")) return;
+                if(!confirm(`¿Anular venta de "${sale.product_name}"? La prenda volverá a estar disponible.`)) return;
                 
-                // Log para verificar que el ID del producto existe en el objeto sale
-                console.log("Intentando restaurar producto ID:", sale.product_id);
-
                 const { error: saleError } = await _supabase
                     .from('sales')
                     .update({ status: 'cancelled' })
@@ -182,21 +180,20 @@
                     return;
                 }
 
-                if (sale.product_id) {
-                    // Forzamos el valor booleano true
+                // GUÍA POR NOMBRE: Buscamos en productos donde el nombre coincida para ponerlo disponible
+                if (sale.product_name) {
                     const { error: prodError } = await _supabase
                         .from('productos')
                         .update({ disponible: true })
-                        .eq('id', sale.product_id);
+                        .eq('nombre', sale.product_name);
                     
                     if (prodError) {
-                        alert("Error de disponibilidad: " + prodError.message);
-                        console.error("Detalle del error en productos:", prodError);
+                        console.error("Error al restaurar por nombre:", prodError.message);
                     } else {
-                        console.log("Producto restaurado correctamente en la DB");
+                        console.log("Producto restaurado correctamente usando el nombre");
                     }
                 } else {
-                    console.error("No se pudo restaurar: La venta no tiene product_id");
+                    console.error("No se pudo restaurar: La venta no tiene product_name");
                 }
 
                 fetchSales();
@@ -242,6 +239,7 @@
                                     <thead>
                                         <tr>
                                             <th>Fecha y Cliente</th>
+                                            <th>Prenda / Producto</th>
                                             <th>Desglose (₡)</th>
                                             <th>Total Cobrado</th>
                                             <th>Estado</th>
@@ -250,7 +248,7 @@
                                     </thead>
                                     <tbody>
                                         {sales.length === 0 ? (
-                                            <tr><td colSpan="5" style={{textAlign: 'center', padding: '20px'}}>No hay registros.</td></tr>
+                                            <tr><td colSpan="6" style={{textAlign: 'center', padding: '20px'}}>No hay registros.</td></tr>
                                         ) : (
                                             sales.map(sale => {
                                                 const monto = Number(sale.total_amount || 0);
@@ -263,6 +261,10 @@
                                                         <td>
                                                             <strong>{sale.customer_name || 'Cliente Web'}</strong>
                                                             <span className="txt-small">{new Date(sale.created_at).toLocaleDateString()}</span>
+                                                        </td>
+                                                        <td>
+                                                            <strong>{sale.product_name || 'Sin nombre'}</strong>
+                                                            <span className="txt-small">Ref: {sale.product_id || 'N/A'}</span>
                                                         </td>
                                                         <td>
                                                             <div className="txt-small">Base: ₡{Math.round(subtotal).toLocaleString()}</div>
