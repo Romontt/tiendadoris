@@ -124,6 +124,7 @@ function App() {
         if (cart.length === 0) return;
 
         const mensajeBase = `¡Hola Siwá! 🌬️ Me interesa realizar el siguiente pedido:%0A%0A`;
+        const nombresProductos = cart.map(item => item.nombre).join(', ');
         const lista = cart.map(item => {
             const precio = parseInt(item.tiene_descuento ? (item.precio_offer || item.precio_oferta) : item.precio);
             return `- 1x ${item.nombre} (₡${precio.toLocaleString()})`;
@@ -133,17 +134,27 @@ function App() {
         const fullLink = `https://wa.me/50683337497?text=${mensajeBase}${lista}${totalTexto}`;
 
         try {
-            // Inserción en tabla 'sales' con las columnas exactas proporcionadas
-            const { error } = await _supabase.from('sales').insert([
+            // 1. Inserción en tabla 'sales' con nombres de productos incluidos
+            const { error: errorSale } = await _supabase.from('sales').insert([
                 {
                     total_amount: cartTotal,
                     status: 'pending',
                     whatsapp_link: fullLink,
-                    customer_name: 'Cliente Web' // Campo requerido por la tabla
+                    customer_name: 'Cliente Web',
+                    product_name: nombresProductos // Se envía la lista de nombres
                 }
             ]);
 
-            if (error) throw error;
+            if (errorSale) throw errorSale;
+
+            // 2. Marcar productos como NO disponibles (Vendidos)
+            const idsParaActualizar = cart.map(item => item.id);
+            const { error: errorUpdate } = await _supabase
+                .from('productos')
+                .update({ disponible: false })
+                .in('id', idsParaActualizar);
+
+            if (errorUpdate) throw errorUpdate;
 
             trackEvent('user_clicks', 
                 { element_id: 'btn-confirm-whatsapp', click_text: 'Confirmar Pedido WhatsApp', page_path: window.location.pathname },
@@ -154,6 +165,10 @@ function App() {
             window.open(fullLink, '_blank');
             setCart([]);
             setIsCartOpen(false);
+            
+            // Refrescar lista de productos para ocultar el vendido
+            const { data: newData } = await _supabase.from('productos').select('*').eq('disponible', true);
+            setItems(newData || []);
 
         } catch (err) {
             console.error("Error en el proceso de compra:", err);
