@@ -124,15 +124,16 @@ function App() {
         if (cart.length === 0) return;
 
         try {
+            // CORRECCIÓN AQUÍ: Se usan los nombres de columnas reales de tu tabla de Supabase
             const { error } = await _supabase.from('sales').insert([
                 {
-                    productos: cart.map(item => ({ 
+                    items_json: cart.map(item => ({ 
                         id: item.id, 
                         nombre: item.nombre, 
                         precio: item.tiene_descuento ? (item.precio_offer || item.precio_oferta) : item.precio 
                     })),
-                    total: cartTotal,
-                    estado: 'pendiente',
+                    total_amount: cartTotal,
+                    status: 'pendiente',
                     session_id: sessionId
                 }
             ]);
