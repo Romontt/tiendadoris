@@ -1,5 +1,20 @@
 const { useState, useEffect } = React;
 
+// --- CONFIGURACIÓN FUERA DEL COMPONENTE (EVITA RE-CREACIÓN) ---
+const _supabase = supabase.createClient(
+    'https://hvnpkljyoocqdzwdptgt.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2bnBrbGp5b29jcWR6d2RwdGd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2MTAxMTQsImV4cCI6MjA5MjE4NjExNH0.-pq3iVzqJsJCyGNXkFPlHSIQeBTrr7i7ptsY6FYjJZ0'
+);
+
+const sessionId = (() => {
+    let id = sessionStorage.getItem('siwa_session');
+    if (!id) {
+        id = crypto.randomUUID();
+        sessionStorage.setItem('siwa_session', id);
+    }
+    return id;
+})();
+
 function App() {
     const [items, setItems] = useState([]);
     const [cat, setCat] = useState('Todos');
@@ -14,20 +29,6 @@ function App() {
 
     // --- ESTADO PARA VISOR DE FOTOS ---
     const [selectedImage, setSelectedImage] = useState(null);
-
-    const _supabase = supabase.createClient(
-        'https://hvnpkljyoocqdzwdptgt.supabase.co',
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2bnBrbGp5b29jcWR6d2RwdGd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2MTAxMTQsImV4cCI6MjA5MjE4NjExNH0.-pq3iVzqJsJCyGNXkFPlHSIQeBTrr7i7ptsY6FYjJZ0'
-    );
-
-    const sessionId = (() => {
-        let id = sessionStorage.getItem('siwa_session');
-        if (!id) {
-            id = crypto.randomUUID();
-            sessionStorage.setItem('siwa_session', id);
-        }
-        return id;
-    })();
 
     const trackEvent = async (table, data, gaEventName = null, gaParams = {}) => {
         try {
@@ -123,7 +124,6 @@ function App() {
         if (cart.length === 0) return;
 
         try {
-            // Se cambió la tabla de 'ventas' a 'sales' según tu base de datos
             const { error } = await _supabase.from('sales').insert([
                 {
                     productos: cart.map(item => ({ 
