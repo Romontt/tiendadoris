@@ -46,6 +46,28 @@ function App() {
         }
     };
 
+    // --- FUNCION COMPARTIR ---
+    const shareProduct = async (e, item) => {
+        e.stopPropagation();
+        const shareData = {
+            title: item.nombre,
+            text: `Mira este tesoro de Siwá: ${item.nombre}`,
+            url: window.location.href
+        };
+
+        try {
+            if (navigator.share) {
+                await navigator.share(shareData);
+            } else {
+                await navigator.clipboard.writeText(window.location.href);
+                alert('Enlace copiado al portapapeles');
+            }
+            trackEvent('user_clicks', { element_id: 'btn-share', click_text: `Compartir: ${item.nombre}` }, 'share', { item_id: item.id });
+        } catch (err) {
+            console.log('Error sharing:', err);
+        }
+    };
+
     // --- EFECTO PARA MANEJAR BOTÓN ATRÁS (VISOR DE IMAGEN) ---
     useEffect(() => {
         if (selectedImage) {
@@ -322,6 +344,19 @@ function App() {
                                                 left: '10px', top: '10px'
                                             }}>-{item.porcentaje_descuento}%</span>
                                         )}
+                                        
+                                        <button 
+                                            onClick={(e) => shareProduct(e, item)}
+                                            style={{
+                                                position: 'absolute', top: '10px', right: '10px',
+                                                background: 'rgba(255,255,255,0.8)', border: 'none', borderRadius: '50%',
+                                                width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                zIndex: 2, cursor: 'pointer'
+                                            }}
+                                        >
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
+                                        </button>
+
                                         {item.stock === 1 && !isOutOfStock && (
                                             <span style={{
                                                 position: 'absolute', bottom: '10px', right: '10px',
@@ -523,12 +558,12 @@ function App() {
                     <div className="footer-column brand-col">
                         <div className="siwa-logo-footer" style={{ fontWeight: '900', fontSize: '2rem' }}>Siwá</div>
                         <p>Moda infantil con propósito y raíz.</p>
-                        <div className="footer-socials" style={{ display: 'flex', gap: '15px', marginTop: '15px' }}>
-                            <a href="https://www.instagram.com/tienda_siwa/" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit' }}>
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                        <div style={{ display: 'flex', gap: '15px', marginTop: '15px' }}>
+                            <a href="https://instagram.com/siwa.cr" target="_blank" style={{ color: '#E1306C' }}>
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
                             </a>
-                            <a href="https://wa.me/50683337497" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit' }}>
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                            <a href="https://wa.me/50683337497" target="_blank" style={{ color: '#25D366' }}>
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 1 1-7.6-11.7 8.38 8.38 0 0 1 3.8.9L21 3z"></path></svg>
                             </a>
                         </div>
                     </div>
