@@ -1,11 +1,9 @@
 const { useState, useEffect } = React;
-
 // --- CONFIGURACIÓN FUERA DEL COMPONENTE (EVITA RE-CREACIÓN) ---
 const _supabase = supabase.createClient(
     'https://hvnpkljyoocqdzwdptgt.supabase.co',
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2bnBrbGp5b29jcWR6d2RwdGd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2MTAxMTQsImV4cCI6MjA5MjE4NjExNH0.-pq3iVzqJsJCyGNXkFPlHSIQeBTrr7i7ptsY6FYjJZ0'
 );
-
 const sessionId = (() => {
     let id = sessionStorage.getItem('siwa_session');
     if (!id) {
@@ -14,7 +12,6 @@ const sessionId = (() => {
     }
     return id;
 })();
-
 function App() {
     const [items, setItems] = useState([]);
     const [cat, setCat] = useState('Todos');
@@ -26,7 +23,6 @@ function App() {
     const [helpModal, setHelpModal] = useState({ open: false, title: '', content: '' });
     // --- ESTADO PARA VISOR DE FOTOS ---
     const [selectedImage, setSelectedImage] = useState(null);
-
     const trackEvent = async (table, data, gaEventName = null, gaParams = {}) => {
         try {
             await _supabase.from(table).insert([{ ...data, session_id: sessionId }]);
@@ -42,7 +38,6 @@ function App() {
             console.error("Tracking error:", e);
         }
     };
-
     // --- FUNCION COMPARTIR ---
     const shareProduct = async (e, item) => {
         e.stopPropagation();
@@ -63,7 +58,6 @@ function App() {
             console.log('Error sharing:', err);
         }
     };
-
     // --- EFECTO PARA MANEJAR BOTÓN ATRÁS (VISOR DE IMAGEN) ---
     useEffect(() => {
         if (selectedImage) {
@@ -75,7 +69,6 @@ function App() {
         window.addEventListener('popstate', handlePopState);
         return () => window.removeEventListener('popstate', handlePopState);
     }, [selectedImage]);
-
     useEffect(() => {
         const path = cat === 'Todos' ? '/' : `/${cat}`;
         trackEvent('page_views', 
@@ -84,7 +77,6 @@ function App() {
             { page_title: `Categoría: ${cat}`, page_location: window.location.href }
         );
     }, [cat]);
-
     useEffect(() => {
         const loadData = async () => {
             setLoading(true);
@@ -104,7 +96,6 @@ function App() {
         };
         loadData();
     }, [cat]);
-
     const addToCart = (product) => {
         const isAlreadyInCart = cart.some(item => item.id === product.id);
         if (!isAlreadyInCart && product.stock > 0) {
@@ -120,7 +111,6 @@ function App() {
             );
         }
     };
-
     const removeFromCart = (cartId) => {
         const item = cart.find(i => i.cartId === cartId);
         setCart(cart.filter(item => item.cartId !== cartId));
@@ -130,12 +120,10 @@ function App() {
             { items: [{ item_id: item?.id, item_name: item?.nombre }] }
         );
     };
-
     const cartTotal = cart.reduce((acc, item) => {
         const precio = item.tiene_descuento ? (item.precio_offer || item.precio_oferta) : item.precio;
         return acc + parseInt(precio);
     }, 0);
-
     const enviarPedidoWhatsApp = async () => {
         if (cart.length === 0) return;
         const mensajeBase = `¡Hola Siwá! 🌬️ Me interesa realizar el siguiente pedido:%0A%0A`;
@@ -147,7 +135,6 @@ function App() {
 
         const totalTexto = `%0A%0A*Total: ₡${cartTotal.toLocaleString()}*%0A_Envío gratis en Guápiles Centro_`;
         const fullLink = `https://wa.me/50683337497?text=${mensajeBase}${lista}${totalTexto}`;
-        
         try {
             const { error: errorSale } = await _supabase.from('sales').insert([
                 {
@@ -159,21 +146,17 @@ function App() {
                 }
             ]);
             if (errorSale) throw errorSale;
-
             const idsParaActualizar = cart.map(item => item.id);
             const { error: errorUpdate } = await _supabase
                 .from('productos')
                 .update({ disponible: false })
                 .in('id', idsParaActualizar);
-            
             if (errorUpdate) throw errorUpdate;
-
             trackEvent('user_clicks', 
                 { element_id: 'btn-confirm-whatsapp', click_text: 'Confirmar Pedido WhatsApp', page_path: window.location.pathname },
                 'begin_checkout',
                 { currency: 'CRC', value: cartTotal, items: cart.map(i => ({ item_id: i.id, item_name: i.nombre })) }
             );
-
             window.open(fullLink, '_blank');
             setCart([]);
             setIsCartOpen(false);            
@@ -184,7 +167,10 @@ function App() {
             alert("Hubo un problema al procesar tu pedido. Por favor, intenta de nuevo.");
         }
     };
-
+    const navTo = (nuevaCat) => {
+        setCat(nuevaCat);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
     const openHelp = (type) => {
         const info = {
             envios: { title: 'Políticas de Envío 🚚', content: 'Realizamos envíos a todo el país vía Correos de Costa Rica. En Guápiles Centro el envío es gratuito. Para el resto del país, el costo se calcula según la zona.' },
@@ -197,9 +183,7 @@ function App() {
         );
         setHelpModal({ open: true, ...info[type] });
     };
-
     const isMobile = window.innerWidth < 768;
-
     return (
         <div className={`app-container tema-${cat}`} style={{ boxSizing: 'border-box' }}>
             <nav className="nav-bar" style={{ 
@@ -273,7 +257,6 @@ function App() {
                     </button>
                 </div>
             </nav>
-
             <header className="hero-section">
                 <div className="hero-content">
                     <span className="hero-label">Colección 2026</span>
@@ -281,7 +264,6 @@ function App() {
                     <p>Prendas elegidas con amor para acompañar cada pequeño gran paso.</p>
                 </div>
             </header>
-
             <main className="main-content" style={{ padding: isMobile ? '15px 8px' : '40px 20px', paddingBottom: '100px' }}>
                 {loading ? (
                     <div className="loader">Cargando tesoros...</div>
@@ -410,11 +392,12 @@ function App() {
                     </div>
                 )}
             </main>
-
             {/* MODAL VISOR DE IMAGEN */}
             {selectedImage && (
                 <div 
-                    onClick={() => window.history.back()}
+                    onClick={() => {
+                        window.history.back();
+                    }}
                     style={{
                         position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
                         background: 'rgba(0,0,0,0.95)', zIndex: 3000, display: 'flex', 
@@ -449,7 +432,6 @@ function App() {
                     </div>
                 </div>
             )}
-
             {/* CARRITO LATERAL */}
             {isCartOpen && (
                 <div style={{
@@ -496,30 +478,20 @@ function App() {
                     )}
                 </div>
             )}
-            
             {/* MODAL DE AYUDA */}
             {helpModal.open && (
                 <div style={{
                     position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
-                    background: 'rgba(0,0,0,0.5)', zIndex: 2000, display: 'flex',
-                    alignItems: 'center', justifyContent: 'center', padding: '20px'
-                }} onClick={() => setHelpModal({ ...helpModal, open: false })}>
-                    <div style={{
-                        background: 'white', padding: '30px', borderRadius: '20px',
-                        maxWidth: '500px', width: '100%', position: 'relative'
-                    }} onClick={e => e.stopPropagation()}>
-                        <h2 style={{ marginTop: 0 }}>{helpModal.title}</h2>
-                        <p style={{ lineHeight: '1.6', color: '#555' }}>{helpModal.content}</p>
-                        <button onClick={() => setHelpModal({ ...helpModal, open: false })} style={{
-                            width: '100%', padding: '12px', borderRadius: '12px', background: '#333',
-                            color: 'white', border: 'none', fontWeight: 'bold', cursor: 'pointer', marginTop: '20px'
-                        }}>Entendido</button>
+                    background: 'rgba(0,0,0,0.5)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px'
+                }}>
+                    <div style={{ background: 'white', padding: '30px', borderRadius: '20px', maxWidth: '500px', width: '100%', position: 'relative' }}>
+                        <button onClick={() => setHelpModal({ ...helpModal, open: false })} style={{ position: 'absolute', top: '15px', right: '15px', background: 'none', border: 'none', fontSize: '1.2rem', cursor: 'pointer' }}>✕</button>
+                        <h2 style={{ marginTop: 0, color: 'var(--rosa-siwa)' }}>{helpModal.title}</h2>
+                        <p style={{ lineHeight: '1.6', color: '#666' }}>{helpModal.content}</p>
+                        <button onClick={() => setHelpModal({ ...helpModal, open: false })} style={{ width: '100%', padding: '12px', borderRadius: '12px', background: '#333', color: 'white', border: 'none', marginTop: '20px', cursor: 'pointer' }}>Entendido</button>
                     </div>
                 </div>
             )}
-        </div>
-    );
-}
             <section className="about-section">
                 <div className="about-container">
                     <div className="about-visual">
