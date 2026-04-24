@@ -299,13 +299,33 @@ function App() {
                                             flexShrink: 0,
                                             cursor: 'zoom-in'
                                         }}>
+                                        
+                                        {/* LOGICA DE ETIQUETA VENDIDO BASADA EN BOOLEANO */}
+                                        {item.vendido === true && (
+                                            <span style={{
+                                                position: 'absolute',
+                                                top: '10px',
+                                                left: '10px',
+                                                background: '#ff4444',
+                                                color: 'white',
+                                                padding: '4px 10px',
+                                                borderRadius: '8px',
+                                                fontSize: '0.75rem',
+                                                fontWeight: 'bold',
+                                                zIndex: 3,
+                                                boxShadow: '0 2px 5px rgba(0,0,0,0.2)'
+                                            }}>
+                                                Vendido
+                                            </span>
+                                        )}
+
                                         {item.tiene_descuento && (
                                             <span className="promo-badge" style={{ 
                                                 position: 'absolute', 
                                                 zIndex: 2,
                                                 fontSize: '0.7rem',
                                                 padding: '4px 8px',
-                                                left: '10px', top: '10px'
+                                                left: item.vendido ? '80px' : '10px', top: '10px'
                                             }}>-{item.porcentaje_descuento}%</span>
                                         )}
                                         <button 
@@ -478,6 +498,9 @@ function App() {
                     )}
                 </div>
             )}
+        </div>
+    );
+}
             {/* MODAL DE AYUDA */}
             {helpModal.open && (
                 <div style={{
