@@ -90,38 +90,38 @@
     <script type="text/babel">
         const { useState, useEffect } = React;
         
-        // Cliente de Supabase conectado a tu proyecto
         const _supabase = supabase.createClient('https://hvnpkljyoocqdzwdptgt.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2bnBrbGp5b29jcWR6d2RwdGd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2MTAxMTQsImV4cCI6MjA5MjE4NjExNH0.-pq3iVzqJsJCyGNXkFPlHSIQeBTrr7i7ptsY6FYjJZ0');
 
         function App() {
             const [sales, setSales] = useState([]);
+            const [loading, setLoading] = useState(true);
             const [metrics, setMetrics] = useState({ total: 0, iva: 0, profit: 0, pending: 0 });
 
             useEffect(() => { fetchSales(); }, []);
 
             async function fetchSales() {
-                // Jala los datos directamente de la tabla 'sales' que vimos en tus capturas
-                const { data, error } = await _supabase
-                    .from('sales')
-                    .select('*')
-                    .order('created_at', { ascending: false });
-                
-                if (error) {
-                    console.error("Error cargando ventas:", error);
-                    return;
-                }
+                try {
+                    setLoading(true);
+                    const { data, error } = await _supabase
+                        .from('sales')
+                        .select('*')
+                        .order('created_at', { ascending: false });
+                    
+                    if (error) throw error;
 
-                if (data) {
-                    setSales(data);
-                    calculateMetrics(data);
+                    if (data) {
+                        setSales(data);
+                        calculateMetrics(data);
+                    }
+                } catch (err) {
+                    console.error("Error cargando ventas:", err.message);
+                } finally {
+                    setLoading(false);
                 }
             }
 
             function calculateMetrics(allSales) {
-                // Filtramos solo las completadas para las métricas de dinero real
                 const completed = allSales.filter(s => s.status === 'completed');
-                
-                // total_amount y total_profit vienen de tu tabla en Supabase
                 const totalVentas = completed.reduce((acc, s) => acc + Number(s.total_amount || 0), 0);
                 const totalIVA = totalVentas - (totalVentas / 1.13); 
                 const gananciaBruta = completed.reduce((acc, s) => acc + Number(s.total_profit || 0), 0);
@@ -135,23 +135,22 @@
             }
 
             async function confirmSale(id) {
-                if(!confirm("¿Deseas confirmar esta venta? Esto ejecutará la lógica de inventario en la base de datos.")) return;
+                if(!confirm("¿Deseas confirmar esta venta? Esto actualizará el stock e inventario.")) return;
                 
-                // Llama a la función RPC 'confirm_sale' que debe estar en tu Supabase
-                // Esta función es la que debe cambiar el estado a 'completed' y restar stock
                 const { error } = await _supabase.rpc('confirm_sale', { p_sale_id: id });
                 
                 if (error) {
-                    alert("Error al confirmar: " + error.message);
+                    alert("Error en la base de datos: " + error.message);
                 } else {
-                    fetchSales(); // Recarga los datos para ver los cambios
+                    alert("¡Venta confirmada e inventario actualizado!");
+                    fetchSales();
                 }
             }
 
             return (
                 <div>
                     <header>
-                        <a href="index.html" className="btn-back"><span>←</span> Volver a Tienda</a>
+                        <a href="admin.html" className="btn-back"><span>←</span> Panel Principal</a>
                         <h1 style={{fontFamily: 'Playfair Display', margin: 0, fontSize: '1.2rem'}}>SIWA FINANCE</h1>
                         <div style={{width: '100px'}}></div>
                     </header>
@@ -161,73 +160,81 @@
                             <div className="stat-card card-total">
                                 <h3>Ingresos Totales</h3>
                                 <p>₡{metrics.total.toLocaleString('es-CR')}</p>
-                                <span className="txt-small">Ventas pagadas (IVA incl.)</span>
+                                <span className="txt-small">Confirmados (IVA incl.)</span>
                             </div>
                             <div className="stat-card card-iva">
                                 <h3>IVA por Reservar</h3>
                                 <p>₡{Math.round(metrics.iva).toLocaleString('es-CR')}</p>
-                                <span className="txt-small">Monto del 13% recolectado</span>
+                                <span className="txt-small">Monto del 13%</span>
                             </div>
                             <div className="stat-card card-profit">
                                 <h3>Ganancia Real</h3>
                                 <p>₡{metrics.profit.toLocaleString('es-CR')}</p>
-                                <span className="txt-small">Basado en costo de prendas</span>
+                                <span className="txt-small">Total tras costos</span>
                             </div>
                             <div className="stat-card card-pending">
                                 <h3>Por Confirmar</h3>
                                 <p>{metrics.pending}</p>
-                                <span className="txt-small">Pedidos pendientes de pago</span>
+                                <span className="txt-small">Pedidos pendientes</span>
                             </div>
                         </div>
 
                         <div className="table-container">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Fecha y Cliente</th>
-                                        <th>Desglose (₡)</th>
-                                        <th>Total Cobrado</th>
-                                        <th>Estado</th>
-                                        <th>Acción</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {sales.map(sale => {
-                                        const subtotal = Number(sale.total_amount) / 1.13;
-                                        const iva = Number(sale.total_amount) - subtotal;
-                                        return (
-                                            <tr key={sale.id}>
-                                                <td>
-                                                    <strong>{sale.customer_name || 'Cliente Web'}</strong>
-                                                    <span className="txt-small">{new Date(sale.created_at).toLocaleDateString()}</span>
-                                                </td>
-                                                <td>
-                                                    <div className="txt-small">Subtotal: ₡{Math.round(subtotal).toLocaleString()}</div>
-                                                    <div className="txt-small">IVA (13%): ₡{Math.round(iva).toLocaleString()}</div>
-                                                    <div className="txt-small" style={{color: 'var(--verde-fino)'}}>Ganancia: ₡{Number(sale.total_profit || 0).toLocaleString()}</div>
-                                                </td>
-                                                <td style={{ fontWeight: '600', color: 'var(--azul-navy)' }}>
-                                                    ₡{Number(sale.total_amount).toLocaleString('es-CR')}
-                                                </td>
-                                                <td>
-                                                    <span className={`badge badge-${sale.status}`}>
-                                                        {sale.status === 'pending' ? 'Pendiente' : 'Pagado'}
-                                                    </span>
-                                                </td>
-                                                <td>
-                                                    {sale.status === 'pending' ? (
-                                                        <button className="btn-confirm" onClick={() => confirmSale(sale.id)}>
-                                                            Confirmar Pago
-                                                        </button>
-                                                    ) : (
-                                                        <span style={{color: '#bdc3c7', fontSize: '0.8rem'}}>✓ Inventario actualizado</span>
-                                                    )}
-                                                </td>
-                                            </tr>
-                                        )
-                                    })}
-                                </tbody>
-                            </table>
+                            {loading ? (
+                                <p style={{padding: '40px', textAlign: 'center'}}>Cargando transacciones...</p>
+                            ) : (
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Fecha y Cliente</th>
+                                            <th>Desglose (₡)</th>
+                                            <th>Total Cobrado</th>
+                                            <th>Estado</th>
+                                            <th>Acción</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {sales.length === 0 ? (
+                                            <tr><td colSpan="5" style={{textAlign: 'center', padding: '20px'}}>No hay ventas registradas.</td></tr>
+                                        ) : (
+                                            sales.map(sale => {
+                                                const subtotal = Number(sale.total_amount) / 1.13;
+                                                const iva = Number(sale.total_amount) - subtotal;
+                                                return (
+                                                    <tr key={sale.id}>
+                                                        <td>
+                                                            <strong>{sale.customer_name || 'Cliente Web'}</strong>
+                                                            <span className="txt-small">{new Date(sale.created_at).toLocaleDateString()}</span>
+                                                        </td>
+                                                        <td>
+                                                            <div className="txt-small">Base: ₡{Math.round(subtotal).toLocaleString()}</div>
+                                                            <div className="txt-small">IVA: ₡{Math.round(iva).toLocaleString()}</div>
+                                                            <div className="txt-small" style={{color: 'var(--verde-fino)'}}>Ganancia: ₡{Number(sale.total_profit || 0).toLocaleString()}</div>
+                                                        </td>
+                                                        <td style={{ fontWeight: '600', color: 'var(--azul-navy)' }}>
+                                                            ₡{Number(sale.total_amount).toLocaleString('es-CR')}
+                                                        </td>
+                                                        <td>
+                                                            <span className={`badge badge-${sale.status}`}>
+                                                                {sale.status === 'pending' ? 'Pendiente' : 'Pagado'}
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            {sale.status === 'pending' ? (
+                                                                <button className="btn-confirm" onClick={() => confirmSale(sale.id)}>
+                                                                    Confirmar Pago
+                                                                </button>
+                                                            ) : (
+                                                                <span style={{color: '#bdc3c7', fontSize: '0.8rem'}}>✓ Procesada</span>
+                                                            )}
+                                                        </td>
+                                                    </tr>
+                                                )
+                                            })
+                                        )}
+                                    </tbody>
+                                </table>
+                            )}
                         </div>
                     </main>
                 </div>
